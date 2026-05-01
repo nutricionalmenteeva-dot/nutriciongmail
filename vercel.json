@@ -19,9 +19,5 @@
       "src": "/(.*)",
       "dest": "/public/$1"
     }
-  ],
-  "env": {
-    "GMAIL_USER": "nutricionalmeteeva@gmail.com",
-    "GMAIL_APP_PASSWORD": "stbq qtuj cofk tpjn"
-  }
+  ]
 }
