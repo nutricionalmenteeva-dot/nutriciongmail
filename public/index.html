@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Meteeva · Mail Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#0f1410;--surface:#161d17;--surface2:#1c261d;--surface3:#243026;
+      --border:#2a382b;--border2:#334836;--sage:#6b9e72;--sage-l:#8dc496;
+      --sage-dim:#3d6641;--gold:#c9a96e;--text:#e8ede9;--text2:#9baa9d;
+      --text3:#5c6e5e;--red:#c06060;--r:16px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5}
+    header{position:sticky;top:0;z-index:200;background:rgba(15,20,16,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 2.5rem;height:62px;display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:14px}
+    .logo-mark{width:34px;height:34px;background:linear-gradient(135deg,var(--sage),var(--sage-dim));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 0 20px rgba(107,158,114,.3)}
+    .logo-name{font-family:'Cormorant Garamond',serif;font-size:1.45rem;font-weight:600;letter-spacing:.5px}
+    .logo-name em{font-style:normal;color:var(--sage)}
+    .sender-badge{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border2);border-radius:30px;padding:6px 14px 6px 10px;font-size:.77rem;color:var(--text2)}
+    .live-dot{width:7px;height:7px;background:var(--sage);border-radius:50%;box-shadow:0 0 8px var(--sage);animation:breathe 2.5s ease-in-out infinite}
+    @keyframes breathe{0%,100%{opacity:1;box-shadow:0 0 8px var(--sage)}50%{opacity:.5;box-shadow:0 0 3px var(--sage)}}
+    .workspace{flex:1;display:grid;grid-template-columns:430px 1fr;gap:1.5rem;padding:1.5rem 2.5rem;max-width:1400px;width:100%;margin:0 auto;position:relative;z-index:1}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.4);animation:fadeUp .5s ease both}
+    .preview-panel>*{animation:fadeUp .5s ease both;animation-delay:.1s}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .card-head{padding:1rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--surface2)}
+    .card-head-title{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:600;letter-spacing:.3px}
+    .card-body{padding:1.4rem}
+    .field{margin-bottom:1rem}
+    .field-label{font-size:.7rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:6px;display:block}
+    .field input,.field select{width:100%;background:var(--surface3);border:1px solid var(--border2);border-radius:9px;padding:9px 13px;font-family:'Outfit',sans-serif;font-size:.88rem;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s}
+    .field input::placeholder{color:var(--text3)}
+    .field input:focus,.field select:focus{border-color:var(--sage-dim);box-shadow:0 0 0 3px rgba(107,158,114,.12)}
+    .tags-wrap{background:var(--surface3);border:1px solid var(--border2);border-radius:9px;padding:7px 10px;display:flex;flex-wrap:wrap;gap:6px;min-height:42px;align-items:center;cursor:text;transition:border-color .2s,box-shadow .2s}
+    .tags-wrap:focus-within{border-color:var(--sage-dim);box-shadow:0 0 0 3px rgba(107,158,114,.12)}
+    .tag{background:rgba(107,158,114,.15);border:1px solid rgba(107,158,114,.3);color:var(--sage-l);padding:2px 8px 2px 10px;border-radius:20px;font-size:.78rem;display:flex;align-items:center;gap:6px;animation:tagIn .2s ease}
+    @keyframes tagIn{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+    .tag-x{cursor:pointer;font-size:.85rem;opacity:.5;line-height:1;transition:opacity .15s}
+    .tag-x:hover{opacity:1}
+    #tagInput{border:none;background:transparent;outline:none;font-family:'Outfit',sans-serif;font-size:.85rem;color:var(--text);flex:1;min-width:110px;padding:2px 4px}
+    #tagInput::placeholder{color:var(--text3);font-size:.82rem}
+    .tpl-row{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:1rem}
+    .tpl-pill{background:var(--surface3);border:1px solid var(--border2);border-radius:10px;padding:9px 12px;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:9px}
+    .tpl-pill:hover{border-color:var(--sage-dim);background:rgba(107,158,114,.08)}
+    .tpl-pill.active{border-color:var(--sage);background:rgba(107,158,114,.12);box-shadow:0 0 12px rgba(107,158,114,.1)}
+    .tpl-icon{font-size:18px}
+    .tpl-name{font-size:.83rem;font-weight:500;color:var(--text)}
+    .tpl-desc{font-size:.7rem;color:var(--text3);margin-top:1px}
+    .divider{font-size:.67rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1.3px;margin:1.2rem 0 .8rem;display:flex;align-items:center;gap:10px}
+    .divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+    /* TOOLBAR */
+    .toolbar{display:flex;gap:2px;background:var(--surface2);border:1px solid var(--border2);border-bottom:none;border-radius:9px 9px 0 0;padding:5px 8px;flex-wrap:wrap;align-items:center}
+    .tb{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;border-radius:6px;cursor:pointer;color:var(--text2);font-size:13px;font-family:'Outfit',sans-serif;font-weight:600;transition:all .15s}
+    .tb:hover{background:var(--surface3);color:var(--sage-l)}
+    .tb-sep{width:1px;background:var(--border);margin:4px 3px;height:18px}
+    .tb-color{width:16px;height:16px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:transform .15s;display:inline-block}
+    .tb-color:hover{transform:scale(1.25)}
+
+    /* RICH EDITOR */
+    #richEditor{min-height:200px;background:var(--surface3);border:1px solid var(--border2);border-radius:0 0 9px 9px;padding:14px 16px;color:var(--text);font-family:'Outfit',sans-serif;font-size:.9rem;line-height:1.75;outline:none;transition:border-color .2s}
+    #richEditor:focus{border-color:var(--sage-dim)}
+    #richEditor[contenteditable]:empty::before{content:attr(data-placeholder);color:var(--text3);pointer-events:none}
+    #richEditor h2{color:var(--text);font-family:'Cormorant Garamond',serif;font-size:1.3rem;margin-bottom:.5rem}
+    #richEditor a{color:var(--sage-l)}
+    #richEditor ul,#richEditor ol{padding-left:1.4rem}
+
+    /* COLOR INPUT ROW */
+    .color-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+    .color-input-wrap{display:flex;gap:6px;align-items:center}
+    input[type=color]{width:36px;height:32px;border:1px solid var(--border2);border-radius:6px;padding:2px;background:transparent;cursor:pointer}
+
+    /* HTML EDITOR */
+    #htmlEditor{width:100%;height:210px;background:#0a0f0b;border:1px solid var(--border2);border-radius:9px;padding:12px 14px;font-family:'Courier New',monospace;font-size:.8rem;color:#a8d5b0;outline:none;resize:vertical;line-height:1.6;transition:border-color .2s}
+    #htmlEditor:focus{border-color:var(--sage-dim)}
+
+    /* SEND */
+    .btn-send{width:100%;background:linear-gradient(135deg,var(--sage),var(--sage-dim));color:#fff;border:none;border-radius:11px;padding:13px;font-family:'Outfit',sans-serif;font-size:.92rem;font-weight:600;cursor:pointer;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:9px;margin-top:1.2rem;letter-spacing:.3px;box-shadow:0 4px 20px rgba(107,158,114,.2)}
+    .btn-send:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 28px rgba(107,158,114,.35)}
+    .btn-send:active:not(:disabled){transform:translateY(0)}
+    .btn-send:disabled{opacity:.5;cursor:not-allowed}
+    .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* PREVIEW */
+    .stats-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem}
+    .stat{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:5px 12px;font-size:.75rem;color:var(--text3);display:flex;align-items:center;gap:5px}
+    .stat strong{color:var(--text2);font-weight:500}
+    .tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:1rem}
+    .tab{padding:7px 16px;font-size:.8rem;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .18s;border-radius:6px 6px 0 0}
+    .tab:hover{color:var(--text2)}
+    .tab.active{color:var(--sage-l);border-bottom-color:var(--sage)}
+    .tab-panel{display:none}
+    .tab-panel.active{display:block}
+    .mockup-head{background:var(--surface2);border:1px solid var(--border);border-radius:10px 10px 0 0;padding:12px 16px;border-bottom:none}
+    .meta-row{display:flex;gap:6px;align-items:baseline;font-size:.78rem;color:var(--text3);margin-bottom:4px}
+    .meta-row:last-child{margin:0}
+    .meta-row strong{color:var(--text2);font-weight:500}
+    .meta-row span{color:var(--text)}
+    #previewFrame{width:100%;height:500px;border:1px solid var(--border);border-radius:0 0 10px 10px;background:#fff}
+    #htmlSource{width:100%;height:560px;background:#0a0f0b;border:1px solid var(--border2);border-radius:10px;padding:14px;font-family:'Courier New',monospace;font-size:.77rem;color:#a8d5b0;outline:none;resize:none}
+
+    /* TOAST */
+    #toast{position:fixed;bottom:2rem;right:2rem;padding:12px 18px;border-radius:12px;font-size:.85rem;font-weight:500;transform:translateY(80px) scale(.95);opacity:0;transition:all .4s cubic-bezier(.34,1.56,.64,1);z-index:999;max-width:300px;display:flex;align-items:center;gap:9px;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+    #toast.show{transform:translateY(0) scale(1);opacity:1}
+    #toast.success{background:var(--sage-dim);color:#fff;border:1px solid var(--sage)}
+    #toast.error{background:#5c1f1f;color:#ffb3b3;border:1px solid var(--red)}
+    @media(max-width:900px){.workspace{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">🌿</div>
+    <span class="logo-name">meteeva <em>· mail</em></span>
+  </div>
+  <div class="sender-badge">
+    <div class="live-dot"></div>
+    nutricionalmeteeva@gmail.com
+  </div>
+</header>
+
+<div class="workspace">
+
+  <!-- COMPOSE -->
+  <div class="card">
+    <div class="card-head">
+      <span>✉️</span>
+      <span class="card-head-title">Componer correo</span>
+    </div>
+    <div class="card-body">
+
+      <div class="field">
+        <label class="field-label">Destinatarios</label>
+        <div class="tags-wrap" id="tagsWrap">
+          <input id="tagInput" type="text" placeholder="email@ejemplo.com — Enter para añadir">
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="field">
+          <label class="field-label">Nombre remitente</label>
+          <input type="text" id="fromName" value="Nutrición Meteeva">
+        </div>
+        <div class="field">
+          <label class="field-label">Reply-To</label>
+          <input type="email" id="replyTo" value="nutricionalmeteeva@gmail.com">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Asunto</label>
+        <input type="text" id="subject" placeholder="Escribe el asunto…">
+      </div>
+
+      <div class="divider">Plantilla</div>
+
+      <div class="tpl-row">
+        <div class="tpl-pill active" data-tpl="bienvenida" onclick="applyTpl(this)">
+          <span class="tpl-icon">🌱</span>
+          <div><div class="tpl-name">Bienvenida</div><div class="tpl-desc">Nuevo paciente</div></div>
+        </div>
+        <div class="tpl-pill" data-tpl="cita" onclick="applyTpl(this)">
+          <span class="tpl-icon">📅</span>
+          <div><div class="tpl-name">Recordatorio</div><div class="tpl-desc">Consulta programada</div></div>
+        </div>
+        <div class="tpl-pill" data-tpl="resultado" onclick="applyTpl(this)">
+          <span class="tpl-icon">📊</span>
+          <div><div class="tpl-name">Resultados</div><div class="tpl-desc">Informe de avance</div></div>
+        </div>
+        <div class="tpl-pill" data-tpl="personalizado" onclick="applyTpl(this)">
+          <span class="tpl-icon">✏️</span>
+          <div><div class="tpl-name">Personalizado</div><div class="tpl-desc">Editor visual libre</div></div>
+        </div>
+      </div>
+
+      <div class="divider">Contenido</div>
+
+      <!-- RICH EDITOR (personalizado) -->
+      <div id="richWrap" style="display:none">
+        <div class="toolbar">
+          <button class="tb" onclick="fmt('bold')" title="Negrita"><b>B</b></button>
+          <button class="tb" onclick="fmt('italic')" title="Cursiva"><i>I</i></button>
+          <button class="tb" onclick="fmt('underline')" title="Subrayado"><u>U</u></button>
+          <div class="tb-sep"></div>
+          <button class="tb" onclick="fmt('justifyLeft')" title="Izquierda" style="font-size:16px">⫷</button>
+          <button class="tb" onclick="fmt('justifyCenter')" title="Centrar" style="font-size:16px">≡</button>
+          <button class="tb" onclick="fmt('justifyRight')" title="Derecha" style="font-size:16px">⫸</button>
+          <div class="tb-sep"></div>
+          <button class="tb" onclick="fmt('insertUnorderedList')" title="Lista">•</button>
+          <button class="tb" onclick="fmt('insertOrderedList')" title="Numerada">1.</button>
+          <div class="tb-sep"></div>
+          <button class="tb" style="font-family:'Cormorant Garamond',serif;font-size:16px;width:34px" onclick="fmtBlock('h2')" title="Título">H</button>
+          <button class="tb" style="font-size:14px;width:34px" onclick="fmtBlock('p')" title="Párrafo">¶</button>
+          <div class="tb-sep"></div>
+          <span style="display:flex;align-items:center;gap:5px;padding:0 4px">
+            <span class="tb-color" style="background:#6b9e72;border-color:#8dc496" onclick="fmtColor('#6b9e72')" title="Verde"></span>
+            <span class="tb-color" style="background:#c9a96e;border-color:#e0c080" onclick="fmtColor('#c9a96e')" title="Dorado"></span>
+            <span class="tb-color" style="background:#e8ede9;border-color:#ccc" onclick="fmtColor('#e8ede9')" title="Claro"></span>
+            <span class="tb-color" style="background:#f06060;border-color:#f09090" onclick="fmtColor('#f06060')" title="Rojo"></span>
+          </span>
+          <div class="tb-sep"></div>
+          <button class="tb" onclick="insertLink()" title="Enlace">🔗</button>
+          <button class="tb" onclick="fmt('removeFormat')" title="Limpiar formato" style="font-size:11px">CLR</button>
+        </div>
+        <div id="richEditor" contenteditable="true"
+             data-placeholder="Escribe aquí tu mensaje… usa la barra de herramientas para dar formato."
+             oninput="onRichEdit()"></div>
+
+        <div class="color-row">
+          <div class="field" style="margin:0">
+            <label class="field-label">Color principal</label>
+            <div class="color-input-wrap">
+              <input type="color" id="accentColor" value="#6b9e72" oninput="syncColorFromPicker()">
+              <input type="text" id="accentHex" value="#6b9e72" style="flex:1;background:var(--surface3);border:1px solid var(--border2);border-radius:8px;padding:7px 10px;font-family:monospace;font-size:.82rem;color:var(--text);outline:none" oninput="syncColorFromHex()">
+            </div>
+          </div>
+          <div class="field" style="margin:0">
+            <label class="field-label">Título / saludo</label>
+            <input type="text" id="customTitle" value="Hola," placeholder="Hola, {nombre}" oninput="buildCustomAndPreview()">
+          </div>
+        </div>
+      </div>
+
+      <!-- HTML EDITOR (plantillas) -->
+      <div id="htmlWrap">
+        <textarea id="htmlEditor" placeholder="Pega o edita el HTML aquí…" oninput="updatePreview()"></textarea>
+      </div>
+
+      <button class="btn-send" id="sendBtn" onclick="sendEmail()">
+        <div class="spinner" id="spinner"></div>
+        <span id="sendLabel">Enviar correo →</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="preview-panel">
+    <div class="card" style="flex:1">
+      <div class="card-head">
+        <span>👁️</span>
+        <span class="card-head-title">Vista previa en tiempo real</span>
+      </div>
+      <div class="card-body">
+        <div class="stats-bar">
+          <div class="stat">📬 <strong id="rcCount">0</strong> dest.</div>
+          <div class="stat">📝 <strong id="charCount">0</strong> chars</div>
+          <div class="stat" style="flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">✉️ <strong id="subjectStat">—</strong></div>
+        </div>
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab('preview',this)">Vista previa</div>
+          <div class="tab" onclick="switchTab('source',this)">HTML fuente</div>
+        </div>
+        <div class="tab-panel active" id="tab-preview">
+          <div class="mockup-head">
+            <div class="meta-row">De: <strong id="pFrom">Nutrición Meteeva</strong> &lt;nutricionalmeteeva@gmail.com&gt;</div>
+            <div class="meta-row">Para: <span id="pTo">—</span></div>
+            <div class="meta-row">Asunto: <span id="pSubject">—</span></div>
+          </div>
+          <iframe id="previewFrame" sandbox="allow-same-origin"></iframe>
+        </div>
+        <div class="tab-panel" id="tab-source">
+          <textarea id="htmlSource" readonly></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── TAGS ─────────────────────────────────────────────
+const recips=[];
+const tagInput=document.getElementById('tagInput');
+const tagsWrap=document.getElementById('tagsWrap');
+tagsWrap.addEventListener('click',()=>tagInput.focus());
+tagInput.addEventListener('keydown',e=>{
+  if(['Enter','Tab',','].includes(e.key)){e.preventDefault();addTag(tagInput.value.trim())}
+  if(e.key==='Backspace'&&!tagInput.value&&recips.length)removeTag(recips.length-1);
+});
+tagInput.addEventListener('blur',()=>{if(tagInput.value.trim())addTag(tagInput.value.trim())});
+function addTag(email){
+  if(!email)return;
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){tagInput.value='';return showToast('⚠️ Email no válido','error')}
+  if(recips.includes(email)){tagInput.value='';return}
+  recips.push(email);renderTags();tagInput.value='';updateStats();
+}
+function removeTag(i){recips.splice(i,1);renderTags();updateStats()}
+function renderTags(){
+  tagsWrap.querySelectorAll('.tag').forEach(t=>t.remove());
+  recips.forEach((r,i)=>{
+    const el=document.createElement('div');el.className='tag';
+    el.innerHTML=`${r}<span class="tag-x" onclick="removeTag(${i})">✕</span>`;
+    tagsWrap.insertBefore(el,tagInput);
+  });
+  document.getElementById('pTo').textContent=recips.length?recips.join(', '):'—';
+}
+
+// ── TABS ──────────────────────────────────────────────
+function switchTab(name,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='source')document.getElementById('htmlSource').value=getCurrentHTML();
+}
+
+// ── PREVIEW ───────────────────────────────────────────
+function renderFrame(html){
+  const f=document.getElementById('previewFrame');
+  const d=f.contentDocument||f.contentWindow.document;
+  d.open();d.write(html);d.close();
+}
+function updatePreview(){
+  const html=document.getElementById('htmlEditor').value;
+  renderFrame(html);updateStats();
+}
+function updateStats(){
+  const html=getCurrentHTML();
+  document.getElementById('rcCount').textContent=recips.length;
+  document.getElementById('charCount').textContent=html.length;
+  const s=document.getElementById('subject').value||'—';
+  document.getElementById('subjectStat').textContent=s;
+  document.getElementById('pSubject').textContent=s;
+  document.getElementById('pFrom').textContent=document.getElementById('fromName').value||'Nutrición Meteeva';
+}
+['subject','fromName'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{updateStats();if(currentTpl!=='personalizado')updatePreview();else buildCustomAndPreview()}));
+
+function getCurrentHTML(){
+  return currentTpl==='personalizado'?buildCustom():document.getElementById('htmlEditor').value;
+}
+
+// ── RICH TEXT ─────────────────────────────────────────
+function fmt(cmd){document.execCommand(cmd,false,null);document.getElementById('richEditor').focus();onRichEdit()}
+function fmtBlock(tag){document.execCommand('formatBlock',false,tag);document.getElementById('richEditor').focus();onRichEdit()}
+function fmtColor(c){document.execCommand('foreColor',false,c);document.getElementById('richEditor').focus();onRichEdit()}
+function insertLink(){const url=prompt('URL del enlace:');if(url){document.execCommand('createLink',false,url);onRichEdit()}}
+function onRichEdit(){buildCustomAndPreview()}
+
+function syncColorFromPicker(){
+  const v=document.getElementById('accentColor').value;
+  document.getElementById('accentHex').value=v;
+  buildCustomAndPreview();
+}
+function syncColorFromHex(){
+  const v=document.getElementById('accentHex').value;
+  if(/^#[0-9a-fA-F]{6}$/.test(v)){document.getElementById('accentColor').value=v;buildCustomAndPreview()}
+}
+
+function buildCustom(){
+  const title=document.getElementById('customTitle')?.value||'Hola,';
+  const accent=document.getElementById('accentColor')?.value||'#6b9e72';
+  const content=document.getElementById('richEditor')?.innerHTML||'';
+  return `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><style>
+  body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:#f2f5f2;}
+  .wrap{max-width:600px;margin:0 auto;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.1);}
+  .hdr{background:${accent};padding:44px 36px;text-align:center;position:relative;}
+  .hdr::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:30px;background:#fff;clip-path:ellipse(60% 100% at 50% 100%);}
+  .hdr h1{color:#fff;font-size:24px;margin:12px 0 0;font-weight:700;}
+  .body{padding:36px 36px 24px;}
+  .body p,.body div{color:#4a4a4a;line-height:1.8;font-size:15px;margin:0 0 14px;}
+  .body h2{color:#2c2c2c;font-size:20px;font-weight:700;margin:0 0 14px;}
+  .body a{color:${accent};text-decoration:none;font-weight:500;}
+  .body ul,.body ol{color:#4a4a4a;font-size:15px;line-height:1.8;padding-left:20px;margin:0 0 14px;}
+  .body strong{color:#2c2c2c;}
+  .foot{background:#f7f3ee;text-align:center;padding:22px;font-size:12px;color:#8a8278;border-top:1px solid #e2dbd4;}
+  .foot strong{color:${accent};}
+</style></head>
+<body>
+<div class="wrap">
+  <div class="hdr"><div style="font-size:44px;margin-bottom:10px">🌿</div><h1>${title}</h1></div>
+  <div class="body">${content||'<p>Escribe tu mensaje en el editor...</p>'}</div>
+  <div class="foot"><p>Con cariño, <strong>Nutrición Meteeva</strong></p><p style="margin-top:4px">nutricionalmeteeva@gmail.com</p></div>
+</div></body></html>`;
+}
+
+function buildCustomAndPreview(){
+  const html=buildCustom();
+  renderFrame(html);updateStats();
+}
+
+// ── TEMPLATES ─────────────────────────────────────────
+let currentTpl='bienvenida';
+
+const TPLS={
+  bienvenida:{
+    subject:'🌿 ¡Bienvenida/o a tu proceso nutricional!',
+    html:`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+  body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:#f0f4f0;}
+  .wrap{max-width:600px;margin:0 auto;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.1);}
+  .hdr{background:linear-gradient(145deg,#4f7153,#7a9e7e);padding:48px 36px;text-align:center;position:relative;}
+  .hdr::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:30px;background:#fff;clip-path:ellipse(60% 100% at 50% 100%);}
+  .hdr h1{color:#fff;font-size:26px;margin:0;font-weight:700;}
+  .hdr p{color:rgba(255,255,255,.8);font-size:13px;margin:8px 0 0;}
+  .body{padding:36px 36px 24px;}
+  h2{color:#2c2c2c;font-size:20px;font-weight:600;margin:0 0 14px;}
+  p{color:#555;line-height:1.75;font-size:15px;margin:0 0 14px;}
+  .hl{background:linear-gradient(135deg,#f0f8f1,#e6f3e8);border-left:4px solid #6b9e72;border-radius:0 10px 10px 0;padding:16px 20px;margin:22px 0;}
+  .hl p{margin:0;color:#3d6641;font-weight:500;}
+  .cta{text-align:center;margin:28px 0 8px;}
+  .cta a{display:inline-block;background:linear-gradient(135deg,#6b9e72,#4f7153);color:#fff;text-decoration:none;padding:14px 32px;border-radius:50px;font-weight:600;font-size:15px;box-shadow:0 4px 16px rgba(79,113,83,.3);}
+  .foot{background:#f7f3ee;text-align:center;padding:22px;font-size:12px;color:#8a8278;border-top:1px solid #e2dbd4;}
+</style></head><body>
+<div class="wrap">
+  <div class="hdr"><div style="font-size:52px;margin-bottom:16px">🌿</div><h1>¡Bienvenida/o a Meteeva!</h1><p>Nutrición personalizada para tu bienestar</p></div>
+  <div class="body">
+    <h2>Hola, {nombre} 👋</h2>
+    <p>Estamos muy felices de que hayas decidido dar este paso tan importante para tu salud. A partir de hoy comenzamos juntos un camino hacia una alimentación equilibrada y sostenible.</p>
+    <div class="hl"><p>📅 Tu primera consulta está programada para el <strong>{fecha}</strong> a las <strong>{hora}</strong>.</p></div>
+    <p>En breve recibirás un formulario inicial para que nos cuentes sobre tus hábitos y objetivos, y así crear tu plan nutricional 100% personalizado.</p>
+    <p>Recuerda que este proceso es tuyo. Estamos aquí para acompañarte y celebrar cada pequeño avance. 💚</p>
+    <div class="cta"><a href="mailto:nutricionalmeteeva@gmail.com">Contactar con Meteeva</a></div>
+  </div>
+  <div class="foot"><p>Con cariño, el equipo de <strong>Nutrición Meteeva</strong> · nutricionalmeteeva@gmail.com</p></div>
+</div></body></html>`
+  },
+  cita:{
+    subject:'📅 Recordatorio: tu consulta nutricional',
+    html:`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+  body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:#f5f0eb;}
+  .wrap{max-width:600px;margin:0 auto;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.1);}
+  .hdr{background:linear-gradient(145deg,#a0724a,#c4956a);padding:44px 36px;text-align:center;position:relative;}
+  .hdr::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:30px;background:#fff;clip-path:ellipse(60% 100% at 50% 100%);}
+  .hdr h1{color:#fff;font-size:24px;margin:12px 0 0;font-weight:700;}
+  .hdr p{color:rgba(255,255,255,.8);font-size:13px;margin:6px 0 0;}
+  .body{padding:36px;}
+  p{color:#555;line-height:1.7;font-size:15px;margin:0 0 14px;}
+  .card{background:#fdf8f4;border:1.5px solid #e8d5c0;border-radius:14px;padding:22px 26px;margin:22px 0;}
+  .row{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+  .row:last-child{margin:0;}
+  .ri{font-size:24px;width:38px;text-align:center;}
+  .rl{font-size:12px;color:#a0724a;font-weight:600;text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;}
+  .rv{font-size:16px;color:#2c2c2c;font-weight:600;}
+  .note{background:#fef9f0;border:1px solid #f0e0c0;border-radius:10px;padding:14px 18px;font-size:13px;color:#7a5f35;}
+  .foot{background:#f7f3ee;text-align:center;padding:22px;font-size:12px;color:#8a8278;border-top:1px solid #e2dbd4;}
+</style></head><body>
+<div class="wrap">
+  <div class="hdr"><div style="font-size:48px">📅</div><h1>Recordatorio de consulta</h1><p>Te esperamos pronto</p></div>
+  <div class="body">
+    <p>Hola, <strong>{nombre}</strong>,</p>
+    <p>Te recordamos que tienes una consulta nutricional programada. ¡Te esperamos con muchas ganas!</p>
+    <div class="card">
+      <div class="row"><span class="ri">🗓️</span><div><div class="rl">Fecha</div><div class="rv">{fecha}</div></div></div>
+      <div class="row"><span class="ri">⏰</span><div><div class="rl">Hora</div><div class="rv">{hora}</div></div></div>
+      <div class="row"><span class="ri">📍</span><div><div class="rl">Modalidad</div><div class="rv">{online / presencial}</div></div></div>
+    </div>
+    <div class="note">⚠️ Si necesitas cancelar o cambiar tu cita, avísanos con al menos <strong>24 horas de antelación</strong> respondiendo a este correo.</div>
+  </div>
+  <div class="foot"><p><strong>Nutrición Meteeva</strong> · nutricionalmeteeva@gmail.com</p></div>
+</div></body></html>`
+  },
+  resultado:{
+    subject:'📊 Tu informe de seguimiento — {mes}',
+    html:`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+  body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:#eef3f5;}
+  .wrap{max-width:600px;margin:0 auto;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.1);}
+  .hdr{background:linear-gradient(145deg,#2a6575,#4a9aad);padding:44px 36px;text-align:center;position:relative;}
+  .hdr::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:30px;background:#fff;clip-path:ellipse(60% 100% at 50% 100%);}
+  .hdr h1{color:#fff;font-size:24px;margin:12px 0 0;font-weight:700;}
+  .hdr p{color:rgba(255,255,255,.8);font-size:13px;margin:6px 0 0;}
+  .body{padding:32px 36px 24px;}
+  p{color:#555;line-height:1.7;font-size:15px;margin:0 0 14px;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0;}
+  .m{background:linear-gradient(135deg,#f0f8fa,#e4f2f5);border-radius:12px;padding:18px;text-align:center;border:1px solid #c8e4eb;}
+  .mv{font-size:28px;font-weight:700;color:#2a6575;}
+  .ml{font-size:11px;color:#6a9aad;font-weight:600;text-transform:uppercase;letter-spacing:.8px;margin-top:4px;}
+  .pw{margin:20px 0;}
+  .pr{display:flex;justify-content:space-between;font-size:13px;color:#555;margin-bottom:7px;}
+  .bar{height:9px;background:#e0edf0;border-radius:50px;overflow:hidden;}
+  .bf{height:100%;background:linear-gradient(90deg,#4a9aad,#2a6575);border-radius:50px;}
+  .comment{background:#f4fbfc;border-left:4px solid #4a9aad;border-radius:0 10px 10px 0;padding:14px 18px;margin:20px 0;}
+  .comment p{margin:0;color:#2a6575;font-style:italic;}
+  .foot{background:#f7f3ee;text-align:center;padding:22px;font-size:12px;color:#8a8278;border-top:1px solid #e2dbd4;}
+</style></head><body>
+<div class="wrap">
+  <div class="hdr"><div style="font-size:48px">📊</div><h1>Tu informe de seguimiento</h1><p>{mes} · Nutrición Meteeva</p></div>
+  <div class="body">
+    <p>Hola, <strong>{nombre}</strong>,</p>
+    <p>Aquí tienes tu resumen de progreso de este período. ¡Lo estás haciendo genial! 💪</p>
+    <div class="grid">
+      <div class="m"><div class="mv">{peso_actual} kg</div><div class="ml">Peso actual</div></div>
+      <div class="m"><div class="mv">{variacion}</div><div class="ml">Variación</div></div>
+      <div class="m"><div class="mv">{IMC}</div><div class="ml">IMC</div></div>
+      <div class="m"><div class="mv">{adherencia}%</div><div class="ml">Adherencia</div></div>
+    </div>
+    <div class="pw">
+      <div class="pr"><span>Objetivo alcanzado</span><span><strong>{porcentaje}%</strong></span></div>
+      <div class="bar"><div class="bf" style="width:{porcentaje}%"></div></div>
+    </div>
+    <div class="comment"><p>"{comentario_personalizado}"</p></div>
+  </div>
+  <div class="foot"><p><strong>Nutrición Meteeva</strong> · nutricionalmeteeva@gmail.com</p></div>
+</div></body></html>`
+  },
+  personalizado:{subject:'',html:''}
+};
+
+function applyTpl(pill){
+  document.querySelectorAll('.tpl-pill').forEach(p=>p.classList.remove('active'));
+  pill.classList.add('active');
+  const key=pill.dataset.tpl;
+  currentTpl=key;
+  if(key==='personalizado'){
+    document.getElementById('richWrap').style.display='block';
+    document.getElementById('htmlWrap').style.display='none';
+    buildCustomAndPreview();
+  } else {
+    document.getElementById('richWrap').style.display='none';
+    document.getElementById('htmlWrap').style.display='block';
+    const t=TPLS[key];
+    if(t.subject)document.getElementById('subject').value=t.subject;
+    document.getElementById('htmlEditor').value=t.html;
+    updatePreview();
+  }
+}
+
+// ── SEND ──────────────────────────────────────────────
+async function sendEmail(){
+  const to=recips,subject=document.getElementById('subject').value.trim();
+  const html=getCurrentHTML();
+  const fromName=document.getElementById('fromName').value.trim();
+  const replyTo=document.getElementById('replyTo').value.trim();
+  if(!to.length)return showToast('⚠️ Añade al menos un destinatario','error');
+  if(!subject)return showToast('⚠️ El asunto está vacío','error');
+  if(!html.trim())return showToast('⚠️ El contenido está vacío','error');
+  const btn=document.getElementById('sendBtn');
+  const sp=document.getElementById('spinner');
+  const lbl=document.getElementById('sendLabel');
+  btn.disabled=true;sp.style.display='block';lbl.textContent='Enviando…';
+  try{
+    const res=await fetch('/api/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to,subject,html,fromName,replyTo})});
+    const d=await res.json();
+    if(d.success)showToast(`✅ Enviado a ${to.length} destinatario${to.length>1?'s':''}`, 'success');
+    else showToast('❌ '+(d.error||'Error desconocido'),'error');
+  }catch{showToast('❌ Error de red','error')}
+  finally{btn.disabled=false;sp.style.display='none';lbl.textContent='Enviar correo →'}
+}
+
+// ── TOAST ─────────────────────────────────────────────
+let toastT;
+function showToast(msg,type){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.className=`show ${type}`;
+  clearTimeout(toastT);toastT=setTimeout(()=>el.className='',4200);
+}
+
+// ── INIT ──────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',()=>{
+  applyTpl(document.querySelector('.tpl-pill.active'));
+});
+</script>
+</body>
+</html>

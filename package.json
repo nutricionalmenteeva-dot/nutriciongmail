@@ -1,0 +1,16 @@
+{
+  "name": "meteeva-email-app",
+  "version": "1.0.0",
+  "description": "Aplicación profesional de envío de correos para Nutrición Meteeva",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'No build needed'"
+  },
+  "dependencies": {
+    "nodemailer": "^6.9.9"
+  },
+  "devDependencies": {
+    "vercel": "^33.0.0"
+  }
+}
