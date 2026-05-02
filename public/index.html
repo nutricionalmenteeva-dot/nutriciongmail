@@ -239,6 +239,9 @@ const LOGO_B64 = "data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BS
 const WA_URL = "https://wa.me/34644137667";
 const EMAIL_URL = "mailto:nutricionalmeteeva@gmail.com";
 
+const WA_ICON = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjE4IiBoZWlnaHQ9IjE4Ij48cGF0aCBmaWxsPSIjZmZmZmZmIiBkPSJNMTcuNDcyIDE0LjM4MmMtLjI5Ny0uMTQ5LTEuNzU4LS44NjctMi4wMy0uOTY3LS4yNzMtLjA5OS0uNDcxLS4xNDgtLjY3LjE1LS4xOTcuMjk3LS43NjcuOTY2LS45NCAxLjE2NC0uMTczLjE5OS0uMzQ3LjIyMy0uNjQ0LjA3NS0uMjk3LS4xNS0xLjI1NS0uNDYzLTIuMzktMS40NzUtLjg4My0uNzg4LTEuNDgtMS43NjEtMS42NTMtMi4wNTktLjE3My0uMjk3LS4wMTgtLjQ1OC4xMy0uNjA2LjEzNC0uMTMzLjI5OC0uMzQ3LjQ0Ni0uNTIuMTQ5LS4xNzQuMTk4LS4yOTguMjk4LS40OTcuMDk5LS4xOTguMDUtLjM3MS0uMDI1LS41Mi0uMDc1LS4xNDktLjY2OS0xLjYxMi0uOTE2LTIuMjA3LS4yNDItLjU3OS0uNDg3LS41LS42NjktLjUxLS4xNzMtLjAwOC0uMzcxLS4wMS0uNTctLjAxLS4xOTggMC0uNTIuMDc0LS43OTIuMzcyLS4yNzIuMjk3LTEuMDQgMS4wMTYtMS4wNCAyLjQ3OSAwIDEuNDYyIDEuMDY1IDIuODc1IDEuMjEzIDMuMDc0LjE0OS4xOTggMi4wOTYgMy4yIDUuMDc3IDQuNDg3LjcwOS4zMDYgMS4yNjIuNDg5IDEuNjk0LjYyNS43MTIuMjI3IDEuMzYuMTk1IDEuODcxLjExOC41NzEtLjA4NSAxLjc1OC0uNzE5IDIuMDA2LTEuNDEzLjI0OC0uNjk0LjI0OC0xLjI4OS4xNzMtMS40MTMtLjA3NC0uMTI0LS4yNzItLjE5OC0uNTctLjM0N20tNS40MjEgNy40MDNoLS4wMDRhOS44NyA5Ljg3IDAgMDEtNS4wMzEtMS4zNzhsLS4zNjEtLjIxNC0zLjc0MS45ODIuOTk4LTMuNjQ4LS4yMzUtLjM3NGE5Ljg2IDkuODYgMCAwMS0xLjUxLTUuMjZjLjAwMS01LjQ1IDQuNDM2LTkuODg0IDkuODg4LTkuODg0IDIuNjQgMCA1LjEyMiAxLjAzIDYuOTg4IDIuODk4YTkuODI1IDkuODI1IDAgMDEyLjg5MyA2Ljk5NGMtLjAwMyA1LjQ1LTQuNDM3IDkuODg0LTkuODg1IDkuODg0bTguNDEzLTE4LjI5N0ExMS44MTUgMTEuODE1IDAgMDAxMi4wNSAwQzUuNDk1IDAgLjE2IDUuMzM1LjE1NyAxMS44OTJjMCAyLjA5Ni41NDcgNC4xNDIgMS41ODggNS45NDVMLjA1NyAyNGw2LjMwNS0xLjY1NGExMS44ODIgMTEuODgyIDAgMDA1LjY4MyAxLjQ0OGguMDA1YzYuNTU0IDAgMTEuODktNS4zMzUgMTEuODkzLTExLjg5M2ExMS44MjEgMTEuODIxIDAgMDAtMy40OC04LjQxM1oiLz48L3N2Zz4=";
+const MAIL_ICON = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjE4IiBoZWlnaHQ9IjE4Ij48cGF0aCBmaWxsPSIjZmZmZmZmIiBkPSJNMjAgNEg0Yy0xLjEgMC0yIC45LTIgMnYxMmMwIDEuMS45IDIgMiAyaDE2YzEuMSAwIDItLjkgMi0yVjZjMC0xLjEtLjktMi0yLTJ6bTAgNGwtOCA1LTgtNVY2bDggNSA4LTV2MnoiLz48L3N2Zz4=";
+
 const CONTACT_BLOCK = `
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0;">
   <tr>
@@ -246,10 +249,24 @@ const CONTACT_BLOCK = `
       <table cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td style="padding-right:10px;">
-            <a href="${WA_URL}" style="display:inline-block;background-color:#25D366;color:#ffffff;text-decoration:none;padding:13px 24px;border-radius:50px;font-family:Arial,sans-serif;font-weight:700;font-size:14px;letter-spacing:.3px;">&#9742; WhatsApp</a>
+            <a href="${WA_URL}" style="display:inline-block;background-color:#25D366;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:50px;font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:14px;letter-spacing:.3px;">
+              <table cellpadding="0" cellspacing="0" border="0" style="display:inline-table;vertical-align:middle;">
+                <tr>
+                  <td style="vertical-align:middle;padding-right:7px;"><img src="${WA_ICON}" width="18" height="18" alt="" style="display:block;border:0;" /></td>
+                  <td style="vertical-align:middle;color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:14px;">WhatsApp</td>
+                </tr>
+              </table>
+            </a>
           </td>
           <td>
-            <a href="${EMAIL_URL}" style="display:inline-block;background-color:#3d5a8a;color:#ffffff;text-decoration:none;padding:13px 24px;border-radius:50px;font-family:Arial,sans-serif;font-weight:700;font-size:14px;letter-spacing:.3px;">&#9993; Correo</a>
+            <a href="${EMAIL_URL}" style="display:inline-block;background-color:#3d5a8a;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:50px;font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:14px;letter-spacing:.3px;">
+              <table cellpadding="0" cellspacing="0" border="0" style="display:inline-table;vertical-align:middle;">
+                <tr>
+                  <td style="vertical-align:middle;padding-right:7px;"><img src="${MAIL_ICON}" width="18" height="18" alt="" style="display:block;border:0;" /></td>
+                  <td style="vertical-align:middle;color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:14px;">Correo</td>
+                </tr>
+              </table>
+            </a>
           </td>
         </tr>
       </table>
@@ -389,9 +406,11 @@ function buildCustom(){
     ${LOGO_IMG}
     <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:700;font-family:Arial,Helvetica,sans-serif;line-height:1.3;">${title}</h1>
   </td></tr>
-  <!-- WAVE divider -->
-  <tr><td bgcolor="${accent}" style="background-color:${accent};padding:0;line-height:0;">
-    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='28' viewBox='0 0 600 28'%3E%3Cpath d='M0,0 C100,28 200,0 300,14 C400,28 500,0 600,14 L600,28 L0,28 Z' fill='%23ffffff'/%3E%3C/svg%3E" width="600" height="28" alt="" style="display:block;width:100%;max-width:600px;" />
+  <!-- WAVE divider: compatible rounded transition -->
+  <tr><td bgcolor="${accent}" style="background-color:${accent};padding:0 0 0 0;line-height:0;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+      <tr><td bgcolor="#ffffff" style="background-color:#ffffff;border-radius:20px 20px 0 0;height:20px;font-size:1px;line-height:1px;">&nbsp;</td></tr>
+    </table>
   </td></tr>
   <!-- BODY -->
   <tr><td bgcolor="#ffffff" style="background-color:#ffffff;padding:32px 36px 28px;">
@@ -426,9 +445,11 @@ const TPLS={
     <h1 style="margin:0;color:#ffffff;font-size:26px;font-weight:700;font-family:Arial,Helvetica,sans-serif;line-height:1.3;">¡Bienvenida/o a Meteeva!</h1>
     <p style="margin:8px 0 0;color:#c8d8f0;font-size:13px;font-family:Arial,Helvetica,sans-serif;">Nutrición personalizada para tu bienestar</p>
   </td></tr>
-  <!-- WAVE -->
+  <!-- WAVE: compatible rounded transition -->
   <tr><td bgcolor="#243552" style="background-color:#243552;padding:0;line-height:0;">
-    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='28' viewBox='0 0 600 28'%3E%3Cpath d='M0,0 C100,28 200,0 300,14 C400,28 500,0 600,14 L600,28 L0,28 Z' fill='%23ffffff'/%3E%3C/svg%3E" width="600" height="28" alt="" style="display:block;width:100%;max-width:600px;" />
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+      <tr><td bgcolor="#ffffff" style="background-color:#ffffff;border-radius:20px 20px 0 0;height:20px;font-size:1px;line-height:1px;">&nbsp;</td></tr>
+    </table>
   </td></tr>
   <!-- BODY -->
   <tr><td bgcolor="#ffffff" style="background-color:#ffffff;padding:36px 36px 28px;">
@@ -469,9 +490,11 @@ const TPLS={
     <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:700;font-family:Arial,Helvetica,sans-serif;line-height:1.3;">Recordatorio de consulta</h1>
     <p style="margin:8px 0 0;color:#c8d8f0;font-size:13px;font-family:Arial,Helvetica,sans-serif;">Te esperamos pronto</p>
   </td></tr>
-  <!-- WAVE -->
+  <!-- WAVE: compatible rounded transition -->
   <tr><td bgcolor="#1a2d50" style="background-color:#1a2d50;padding:0;line-height:0;">
-    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='28' viewBox='0 0 600 28'%3E%3Cpath d='M0,0 C100,28 200,0 300,14 C400,28 500,0 600,14 L600,28 L0,28 Z' fill='%23ffffff'/%3E%3C/svg%3E" width="600" height="28" alt="" style="display:block;width:100%;max-width:600px;" />
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+      <tr><td bgcolor="#ffffff" style="background-color:#ffffff;border-radius:20px 20px 0 0;height:20px;font-size:1px;line-height:1px;">&nbsp;</td></tr>
+    </table>
   </td></tr>
   <!-- BODY -->
   <tr><td bgcolor="#ffffff" style="background-color:#ffffff;padding:36px 36px 28px;">
