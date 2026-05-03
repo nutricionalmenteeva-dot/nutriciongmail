@@ -31,7 +31,7 @@
     .sender-badge{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border2);border-radius:30px;padding:6px 14px 6px 10px;font-size:.77rem;color:var(--text2)}
     .live-dot{width:7px;height:7px;background:var(--navy-l);border-radius:50%;box-shadow:0 0 8px var(--navy-l);animation:breathe 2.5s ease-in-out infinite}
     @keyframes breathe{0%,100%{opacity:1;box-shadow:0 0 8px var(--navy-l)}50%{opacity:.5;box-shadow:0 0 3px var(--navy-l)}}
-    .workspace{flex:1;display:grid;grid-template-columns:430px 1fr;gap:1.5rem;padding:1.5rem 2.5rem;max-width:1400px;width:100%;margin:0 auto;position:relative;z-index:1}
+    .workspace{flex:1;display:grid;grid-template-columns:430px 1fr;gap:1.5rem;position:relative;z-index:1}
     .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.4);animation:fadeUp .5s ease both}
     .preview-panel>*{animation:fadeUp .5s ease both;animation-delay:.1s}
     @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
@@ -108,7 +108,106 @@
     #toast.success{background:var(--navy-dim);color:#fff;border:1px solid var(--navy)}
     #toast.error{background:#5c1f1f;color:#ffb3b3;border:1px solid var(--red)}
     @media(max-width:900px){.workspace{grid-template-columns:1fr}}
+    /* ── APP SHELL ── */
+    body{overflow:hidden;height:100vh}
+    .app-shell{display:flex;flex:1;overflow:hidden;height:calc(100vh - 62px)}
+    
+    /* ── SIDEBAR ── */
+    .sidebar{width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:.8rem 0;overflow-y:auto;scrollbar-width:none}
+    .sidebar::-webkit-scrollbar{display:none}
+    .sidebar-section{padding:.5rem .8rem .2rem;font-size:.62rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1.4px}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:.7rem 1rem;margin:.1rem .6rem;border-radius:10px;cursor:pointer;transition:all .18s;color:var(--text2);font-size:.84rem;font-weight:500;position:relative}
+    .nav-item:hover{background:var(--surface2);color:var(--text)}
+    .nav-item.active{background:rgba(61,90,138,.18);color:var(--navy-l);box-shadow:0 0 0 1px rgba(61,90,138,.25)}
+    .nav-item .nav-icon{font-size:1rem;width:20px;text-align:center;flex-shrink:0}
+    .nav-item .nav-label{flex:1}
+    .nav-item .nav-badge{background:var(--navy-dim);color:var(--navy-l);font-size:.63rem;font-weight:700;padding:1px 7px;border-radius:12px;min-width:20px;text-align:center}
+    .nav-item .nav-badge.gold{background:rgba(201,169,110,.15);color:var(--gold)}
+    .nav-sep{height:1px;background:var(--border);margin:.6rem .8rem}
+    .nav-account{margin:.6rem;padding:.8rem;background:var(--surface2);border:1px solid var(--border);border-radius:11px}
+    .nav-account-email{font-size:.72rem;color:var(--text3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .nav-account-name{font-size:.8rem;font-weight:600;color:var(--text2)}
+    .btn-nav-connect{width:100%;margin-top:.6rem;padding:6px;background:linear-gradient(135deg,var(--navy-l),var(--navy-dim));color:#fff;border:none;border-radius:8px;font-size:.75rem;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s}
+    .btn-nav-connect:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(61,90,138,.3)}
+    .btn-nav-disconnect{width:100%;margin-top:.4rem;padding:5px;background:transparent;color:var(--text3);border:1px solid var(--border2);border-radius:7px;font-size:.72rem;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s}
+    .btn-nav-disconnect:hover{border-color:var(--red);color:var(--red)}
 
+    /* ── MAIN CONTENT ── */
+    .main-content{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+    .main-content::-webkit-scrollbar{width:4px}
+    .main-content::-webkit-scrollbar-track{background:transparent}
+    .main-content::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+    
+    /* ── PAGES — cada una ocupa todo el espacio disponible ── */
+    .main-content{flex:1;position:relative;overflow:hidden}
+    .page{
+      display:none;
+      position:absolute;
+      inset:0;
+      overflow-y:auto;
+      scrollbar-width:thin;
+      scrollbar-color:var(--border2) transparent;
+    }
+    .page::-webkit-scrollbar{width:4px}
+    .page::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+    .page.active{display:flex;flex-direction:column}
+
+    /* COMPOSE — scrollable, two-col workspace */
+    .page-compose{padding:1.5rem 2rem;gap:0}
+    .page-compose .workspace{
+      padding:0;margin:0;max-width:none;width:100%;
+      display:grid;grid-template-columns:430px 1fr;gap:1.5rem;
+    }
+
+    /* GMAIL PAGES — fixed header + scrollable list */
+    .page-gmail{padding:0;overflow:hidden}
+    .gmail-page-head{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:1rem 1.8rem;
+      border-bottom:1px solid var(--border);
+      background:var(--surface2);
+      flex-shrink:0;
+      position:sticky;top:0;z-index:10;
+    }
+    .gmail-page-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;display:flex;align-items:center;gap:10px}
+    .page-gmail .gmail-card{
+      flex:1;display:flex;flex-direction:column;
+      border:none;border-radius:0;box-shadow:none;
+      background:var(--surface);overflow:hidden;
+    }
+    .page-gmail .gmail-list{
+      flex:1;overflow-y:auto;max-height:none;
+      scrollbar-width:thin;scrollbar-color:var(--border2) transparent;
+    }
+    .page-gmail .gmail-list::-webkit-scrollbar{width:4px}
+    .page-gmail .gmail-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+    .gmail-item{padding:.9rem 1.8rem;border-bottom:1px solid var(--border);transition:background .15s}
+    .gmail-item:hover{background:var(--surface2)}
+    
+    @media(max-width:900px){
+      .sidebar{width:60px}
+      .nav-item .nav-label,.nav-item .nav-badge,.sidebar-section,.nav-account-email,.nav-account-name{display:none}
+      .nav-account{padding:.5rem;text-align:center}
+      .btn-nav-connect span{display:none}
+      .btn-nav-connect{padding:6px;min-width:36px;justify-content:center}
+      .btn-nav-disconnect{display:none}
+    }
+
+
+
+    /* ── ADJUNTOS ── */
+    .attach-zone{border:2px dashed var(--border2);border-radius:10px;padding:.9rem 1rem;margin-top:.8rem;transition:all .2s;cursor:pointer;position:relative}
+    .attach-zone:hover,.attach-zone.drag-over{border-color:var(--navy);background:rgba(61,90,138,.06)}
+    .attach-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+    .attach-label{display:flex;align-items:center;gap:8px;color:var(--text3);font-size:.8rem;pointer-events:none}
+    .attach-label span{font-size:1.1rem}
+    .attach-list{display:flex;flex-wrap:wrap;gap:7px;margin-top:.7rem}
+    .attach-chip{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:5px 10px;font-size:.75rem;color:var(--text2);max-width:220px}
+    .attach-chip-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+    .attach-chip-size{color:var(--text3);font-size:.68rem;flex-shrink:0}
+    .attach-chip-del{cursor:pointer;color:var(--text3);flex-shrink:0;font-size:13px;line-height:1;transition:color .15s;padding:0 2px}
+    .attach-chip-del:hover{color:var(--red)}
+    .attach-icon{font-size:.85rem;flex-shrink:0}
     /* ── GMAIL PANEL ── */
     .gmail-section{max-width:1400px;width:100%;margin:0 auto 2.5rem;padding:0 2.5rem;position:relative;z-index:1}
     .gmail-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
@@ -183,7 +282,51 @@
   </div>
 </header>
 
-<div class="workspace">
+<div class="app-shell">
+
+  <!-- ── SIDEBAR ── -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-section">Principal</div>
+    <div class="nav-item active" onclick="navTo('compose',this)" id="nav-compose">
+      <span class="nav-icon">✉️</span>
+      <span class="nav-label">Nuevo correo</span>
+    </div>
+    
+    <div class="nav-sep"></div>
+    <div class="sidebar-section">Gmail</div>
+    
+    <div class="nav-item" onclick="navTo('inbox',this)" id="nav-inbox">
+      <span class="nav-icon">📥</span>
+      <span class="nav-label">Bandeja</span>
+      <span class="nav-badge" id="inboxBadge" style="display:none">0</span>
+    </div>
+    <div class="nav-item" onclick="navTo('drafts',this)" id="nav-drafts">
+      <span class="nav-icon">📝</span>
+      <span class="nav-label">Borradores</span>
+      <span class="nav-badge gold" id="draftsBadge" style="display:none">0</span>
+    </div>
+    
+    <div style="flex:1"></div>
+    <div class="nav-sep"></div>
+    
+    <!-- Account block -->
+    <div class="nav-account" id="navAccount">
+      <div class="nav-account-name" id="navAccountName">Sin conectar</div>
+      <div class="nav-account-email" id="navAccountEmail">Google no conectado</div>
+      <button class="btn-nav-connect" id="navConnectBtn" onclick="gmailAuth()">
+        <svg width="13" height="13" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#fff" opacity=".9"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#fff" opacity=".9"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#fff" opacity=".9"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#fff" opacity=".9"/></svg>
+        <span>Conectar Google</span>
+      </button>
+      <button class="btn-nav-disconnect" id="navDisconnectBtn" style="display:none" onclick="gmailDisconnect()">Desconectar</button>
+    </div>
+  </nav>
+
+  <!-- ── MAIN CONTENT ── -->
+  <div class="main-content" id="mainContent">
+
+    <!-- PAGE: COMPOSE -->
+    <div class="page active page-compose" id="page-compose">
+      <div class="workspace">
   <div class="card">
     <div class="card-head"><span>✉️</span><span class="card-head-title">Componer correo</span></div>
     <div class="card-body">
@@ -247,7 +390,12 @@
         </div>
       </div>
       <div id="htmlWrap"><textarea id="htmlEditor" placeholder="Pega o edita el HTML aquí…" oninput="updatePreview()" style="display:none"></textarea></div>
-      <button class="btn-send" id="sendBtn" onclick="sendEmail()">
+      <div class="attach-zone" id="attachZone" ondragover="attachDragOver(event)" ondragleave="attachDragLeave()" ondrop="attachDrop(event)">
+        <input type="file" id="attachInput" multiple onchange="attachFiles(this.files)">
+        <div class="attach-label"><span>📎</span> Arrastra archivos aquí o haz clic para adjuntar</div>
+      </div>
+      <div class="attach-list" id="attachList"></div>
+            <button class="btn-send" id="sendBtn" onclick="sendEmail()">
         <div class="spinner" id="spinner"></div>
         <span id="sendLabel">Enviar correo →</span>
       </button>
@@ -286,43 +434,33 @@
     </div>
   </div>
 </div>
+    </div><!-- /workspace -->
+    </div><!-- /page-compose -->
 
-
-<!-- ── GMAIL SECTION ── -->
-<div class="gmail-section" id="gmailSection" style="display:none">
-  <div class="gmail-grid">
-    <div class="gmail-card">
-      <div class="gmail-head">
-        <div class="gmail-head-left"><span>📥</span><span class="gmail-head-title">Bandeja de entrada</span><span class="gmail-badge" id="inboxBadge">0</span></div>
+    <!-- PAGE: INBOX -->
+    <div class="page page-gmail" id="page-inbox">
+      <div class="gmail-page-head">
+        <div class="gmail-page-title">📥 Bandeja de entrada</div>
         <button class="btn-refresh" onclick="loadInbox()">↻ Actualizar</button>
       </div>
-      <div id="inboxList" class="gmail-list"><div class="gmail-loading"><div class="gmail-spinner"></div> Cargando…</div></div>
+      <div class="gmail-card" style="flex:1">
+        <div id="inboxList" class="gmail-list"><div class="gmail-loading"><div class="gmail-spinner"></div> Cargando…</div></div>
+      </div>
     </div>
-    <div class="gmail-card">
-      <div class="gmail-head">
-        <div class="gmail-head-left"><span>📝</span><span class="gmail-head-title">Borradores</span><span class="gmail-badge" id="draftsBadge">0</span></div>
+
+    <!-- PAGE: DRAFTS -->
+    <div class="page page-gmail" id="page-drafts">
+      <div class="gmail-page-head">
+        <div class="gmail-page-title">📝 Borradores</div>
         <button class="btn-refresh" onclick="loadDrafts()">↻ Actualizar</button>
       </div>
-      <div id="draftsList" class="gmail-list"><div class="gmail-loading"><div class="gmail-spinner"></div> Cargando…</div></div>
+      <div class="gmail-card" style="flex:1">
+        <div id="draftsList" class="gmail-list"><div class="gmail-loading"><div class="gmail-spinner"></div> Cargando…</div></div>
+      </div>
     </div>
-  </div>
-</div>
 
-<div class="gmail-section" id="gmailAuthSection">
-  <div class="gmail-card" style="max-width:480px;margin:0 auto">
-    <div class="gmail-head">
-      <div class="gmail-head-left"><span>📧</span><span class="gmail-head-title">Gmail · Meteeva</span></div>
-    </div>
-    <div class="gmail-auth-state">
-      <p>Conecta tu cuenta de Gmail para ver la bandeja de entrada y borradores directamente aquí.</p>
-      <button class="btn-gmail-auth" onclick="gmailAuth()">
-        <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#fff" opacity=".9"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#fff" opacity=".9"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#fff" opacity=".9"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#fff" opacity=".9"/></svg>
-        Conectar con Google
-      </button>
-      <p style="margin-top:.9rem;font-size:.72rem;color:var(--text3)">Solo lectura — nunca se envía nada sin tu confirmación.</p>
-    </div>
-  </div>
-</div>
+  </div><!-- /main-content -->
+</div><!-- /app-shell -->
 
 <div class="gmail-modal-overlay" id="emailModal" style="display:none" onclick="closeModal(event)">
   <div class="gmail-modal" onclick="event.stopPropagation()">
@@ -729,6 +867,51 @@ function applyTpl(pill){
   }
 }
 
+// ── ATTACHMENTS ──
+let attachedFiles = [];
+
+function attachFiles(files){
+  for(const f of files){
+    if(attachedFiles.find(x=>x.name===f.name && x.size===f.size)) continue;
+    if(f.size > 15*1024*1024){showToast('⚠️ '+f.name+' supera 15 MB','error');continue;}
+    attachedFiles.push(f);
+  }
+  renderAttachList();
+  document.getElementById('attachInput').value='';
+}
+
+function renderAttachList(){
+  const list = document.getElementById('attachList');
+  list.innerHTML='';
+  attachedFiles.forEach((f,i)=>{
+    const ext = f.name.split('.').pop().toLowerCase();
+    const icon = {pdf:'📄',doc:'📝',docx:'📝',xls:'📊',xlsx:'📊',jpg:'🖼️',jpeg:'🖼️',png:'🖼️',gif:'🖼️',zip:'🗜️',mp4:'🎬',mp3:'🎵'}[ext]||'📎';
+    const size = f.size < 1024*1024 ? (f.size/1024).toFixed(0)+'KB' : (f.size/1024/1024).toFixed(1)+'MB';
+    const chip = document.createElement('div');
+    chip.className='attach-chip';
+    chip.innerHTML=`<span class="attach-icon">${icon}</span><span class="attach-chip-name" title="${escHtml(f.name)}">${escHtml(f.name)}</span><span class="attach-chip-size">${size}</span><span class="attach-chip-del" onclick="removeAttach(${i})" title="Quitar">✕</span>`;
+    list.appendChild(chip);
+  });
+}
+
+function removeAttach(i){
+  attachedFiles.splice(i,1);
+  renderAttachList();
+}
+
+function attachDragOver(e){
+  e.preventDefault();
+  document.getElementById('attachZone').classList.add('drag-over');
+}
+function attachDragLeave(){
+  document.getElementById('attachZone').classList.remove('drag-over');
+}
+function attachDrop(e){
+  e.preventDefault();
+  document.getElementById('attachZone').classList.remove('drag-over');
+  attachFiles(e.dataTransfer.files);
+}
+
 async function sendEmail(){
   const to=recips,subject=document.getElementById('subject').value.trim();
   const html=getCurrentHTML();
@@ -742,10 +925,25 @@ async function sendEmail(){
   const lbl=document.getElementById('sendLabel');
   btn.disabled=true;sp.style.display='block';lbl.textContent='Enviando…';
   try{
-    const res=await fetch('/api/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to,subject,html,fromName,replyTo})});
+    let res;
+    if(attachedFiles.length > 0){
+      const fd = new FormData();
+      fd.append('to', JSON.stringify(to));
+      fd.append('subject', subject);
+      fd.append('html', html);
+      fd.append('fromName', fromName);
+      fd.append('replyTo', replyTo);
+      attachedFiles.forEach(f => fd.append('attachments', f, f.name));
+      res = await fetch('/api/send', {method:'POST', body: fd});
+    } else {
+      res = await fetch('/api/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to,subject,html,fromName,replyTo})});
+    }
     const d=await res.json();
-    if(d.success)showToast('✅ Enviado a '+to.length+' destinatario'+(to.length>1?'s':''),'success');
-    else showToast('❌ '+(d.error||'Error desconocido'),'error');
+    if(d.success){
+      showToast('✅ Enviado a '+to.length+' destinatario'+(to.length>1?'s':'')+(attachedFiles.length?' con '+attachedFiles.length+' adjunto'+(attachedFiles.length>1?'s':''):''),'success');
+      attachedFiles=[];
+      renderAttachList();
+    } else showToast('❌ '+(d.error||'Error desconocido'),'error');
   }catch(e){showToast('❌ Error de red','error')}
   finally{btn.disabled=false;sp.style.display='none';lbl.textContent='Enviar correo →'}
 }
@@ -768,13 +966,51 @@ const GMAIL_SCOPE = 'https://www.googleapis.com/auth/gmail.readonly';
 let gmailToken = null;
 let currentModalMsg = null;
 
+// ── NAVIGATION ──
+function navTo(page, el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const pg = document.getElementById('page-'+page);
+  if(pg) pg.classList.add('active');
+  if(el) el.classList.add('active');
+  else {
+    const nav = document.getElementById('nav-'+page);
+    if(nav) nav.classList.add('active');
+  }
+  // Load gmail data when switching to those pages
+  if(page==='inbox' && gmailToken) loadInbox();
+  if(page==='drafts' && gmailToken) loadDrafts();
+}
+
 function initGmail(){
-  const t = sessionStorage.getItem('gm_token');
-  const exp = sessionStorage.getItem('gm_exp');
+  const t = localStorage.getItem('gm_token');
+  const exp = localStorage.getItem('gm_exp');
   if(t && exp && Date.now() < parseInt(exp)){
     gmailToken = t;
     showGmailPanel();
+    // Auto-refresh token 5 min before expiry
+    const msLeft = parseInt(exp) - Date.now();
+    const refreshIn = Math.max(msLeft - 5*60*1000, 10000);
+    setTimeout(()=>silentRefresh(), refreshIn);
   }
+}
+
+function silentRefresh(){
+  if(!_tokenClient){
+    _tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: GMAIL_CLIENT_ID,
+      scope: GMAIL_SCOPE,
+      callback: (resp) => {
+        if(resp.error) return;
+        gmailToken = resp.access_token;
+        localStorage.setItem('gm_token', gmailToken);
+        localStorage.setItem('gm_exp', Date.now() + 3500*1000);
+        // Schedule next refresh
+        setTimeout(()=>silentRefresh(), (3500-300)*1000);
+      }
+    });
+  }
+  _tokenClient.requestAccessToken({prompt:'none'});
 }
 
 let _tokenClient = null;
@@ -786,8 +1022,9 @@ function gmailAuth(){
       callback: (resp) => {
         if(resp.error){ showToast('⚠️ Error al conectar con Google: '+resp.error,'error'); return; }
         gmailToken = resp.access_token;
-        sessionStorage.setItem('gm_token', gmailToken);
-        sessionStorage.setItem('gm_exp', Date.now() + 3500*1000);
+        localStorage.setItem('gm_token', gmailToken);
+        localStorage.setItem('gm_exp', Date.now() + 3500*1000);
+        setTimeout(()=>silentRefresh(), (3500-300)*1000);
         showGmailPanel();
       }
     });
@@ -796,10 +1033,33 @@ function gmailAuth(){
 }
 
 function showGmailPanel(){
-  document.getElementById('gmailAuthSection').style.display='none';
-  document.getElementById('gmailSection').style.display='block';
-  loadInbox();
-  loadDrafts();
+  // Update sidebar account block
+  document.getElementById('navConnectBtn').style.display='none';
+  document.getElementById('navDisconnectBtn').style.display='';
+  document.getElementById('navAccountName').textContent='Gmail conectado';
+  document.getElementById('navAccountEmail').textContent='nutricionalmeteeva@gmail.com';
+  // Show badges
+  document.getElementById('inboxBadge').style.display='';
+  document.getElementById('draftsBadge').style.display='';
+  // Load data for current page
+  const activePage = document.querySelector('.page.active');
+  if(activePage && activePage.id==='page-inbox') loadInbox();
+  else if(activePage && activePage.id==='page-drafts') loadDrafts();
+}
+
+function gmailDisconnect(){
+  gmailToken=null;
+  localStorage.removeItem('gm_token');
+  localStorage.removeItem('gm_exp');
+  document.getElementById('navConnectBtn').style.display='';
+  document.getElementById('navDisconnectBtn').style.display='none';
+  document.getElementById('navAccountName').textContent='Sin conectar';
+  document.getElementById('navAccountEmail').textContent='Google no conectado';
+  document.getElementById('inboxBadge').style.display='none';
+  document.getElementById('draftsBadge').style.display='none';
+  document.getElementById('inboxList').innerHTML='<div class="gmail-loading">Conecta tu cuenta de Google para ver los correos</div>';
+  document.getElementById('draftsList').innerHTML='<div class="gmail-loading">Conecta tu cuenta de Google para ver los borradores</div>';
+  showToast('Cuenta desconectada','success');
 }
 
 async function gmailFetch(url){
@@ -807,7 +1067,8 @@ async function gmailFetch(url){
   const r = await fetch(url, {headers:{Authorization:'Bearer '+gmailToken}});
   if(r.status===401){
     gmailToken=null;
-    sessionStorage.removeItem('gm_token');
+    localStorage.removeItem('gm_token')
+    localStorage.removeItem('gm_exp');
     document.getElementById('gmailAuthSection').style.display='';
     document.getElementById('gmailSection').style.display='none';
     return null;
@@ -817,6 +1078,7 @@ async function gmailFetch(url){
 
 async function loadInbox(){
   const list = document.getElementById('inboxList');
+  if(!gmailToken){list.innerHTML='<div class="gmail-empty">🔗 Conecta tu cuenta de Google desde el menú lateral</div>';return;}
   list.innerHTML='<div class="gmail-loading"><div class="gmail-spinner"></div> Cargando…</div>';
   const data = await gmailFetch('https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=20&labelIds=INBOX&q=in:inbox');
   if(!data){list.innerHTML='<div class="gmail-empty">⚠️ Error al cargar</div>';return;}
@@ -825,7 +1087,9 @@ async function loadInbox(){
     document.getElementById('inboxBadge').textContent='0';
     return;
   }
-  document.getElementById('inboxBadge').textContent=data.resultSizeEstimate||data.messages.length;
+  const inbCnt = data.resultSizeEstimate||data.messages.length;
+  document.getElementById('inboxBadge').textContent=inbCnt>99?'99+':inbCnt;
+  document.getElementById('inboxBadge').style.display='';
   list.innerHTML='';
   const msgs = data.messages.slice(0,15);
   for(const m of msgs){
@@ -848,6 +1112,7 @@ async function loadInbox(){
 
 async function loadDrafts(){
   const list = document.getElementById('draftsList');
+  if(!gmailToken){list.innerHTML='<div class="gmail-empty">🔗 Conecta tu cuenta de Google desde el menú lateral</div>';return;}
   list.innerHTML='<div class="gmail-loading"><div class="gmail-spinner"></div> Cargando…</div>';
   const data = await gmailFetch('https://gmail.googleapis.com/gmail/v1/users/me/drafts?maxResults=15');
   if(!data){list.innerHTML='<div class="gmail-empty">⚠️ Error al cargar</div>';return;}
@@ -856,7 +1121,9 @@ async function loadDrafts(){
     document.getElementById('draftsBadge').textContent='0';
     return;
   }
-  document.getElementById('draftsBadge').textContent=data.resultSizeEstimate||data.drafts.length;
+  const drCnt = data.resultSizeEstimate||data.drafts.length;
+  document.getElementById('draftsBadge').textContent=drCnt>99?'99+':drCnt;
+  document.getElementById('draftsBadge').style.display='';
   list.innerHTML='';
   const drafts = data.drafts.slice(0,12);
   for(const d of drafts){
@@ -912,7 +1179,7 @@ async function openDraft(draftId, msgId, subject, to){
     }
   }
   showToast('📝 Borrador cargado en el editor','success');
-  window.scrollTo({top:0,behavior:'smooth'});
+  navTo('compose', document.getElementById('nav-compose'));
 }
 
 function getEmailBody(payload){
