@@ -113,7 +113,7 @@
     .app-shell{display:flex;flex:1;overflow:hidden;height:calc(100vh - 62px)}
     
     /* ── SIDEBAR ── */
-    .sidebar{width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:.8rem 0;overflow-y:auto;scrollbar-width:none}
+    .sidebar{width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:.8rem 0;overflow-y:auto;scrollbar-width:none;position:relative;z-index:10}
     .sidebar::-webkit-scrollbar{display:none}
     .sidebar-section{padding:.5rem .8rem .2rem;font-size:.62rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1.4px}
     .nav-item{display:flex;align-items:center;gap:10px;padding:.7rem 1rem;margin:.1rem .6rem;border-radius:10px;cursor:pointer;transition:all .18s;color:var(--text2);font-size:.84rem;font-weight:500;position:relative}
@@ -131,54 +131,29 @@
     .btn-nav-connect:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(61,90,138,.3)}
     .btn-nav-disconnect{width:100%;margin-top:.4rem;padding:5px;background:transparent;color:var(--text3);border:1px solid var(--border2);border-radius:7px;font-size:.72rem;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s}
     .btn-nav-disconnect:hover{border-color:var(--red);color:var(--red)}
+    .label-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+    .nav-item.label-item{padding:.5rem 1rem;margin:.05rem .6rem;font-size:.8rem}
+    .nav-item.label-item .nav-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
     /* ── MAIN CONTENT ── */
-    .main-content{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
-    .main-content::-webkit-scrollbar{width:4px}
-    .main-content::-webkit-scrollbar-track{background:transparent}
-    .main-content::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
-    
-    /* ── PAGES — cada una ocupa todo el espacio disponible ── */
-    .main-content{flex:1;position:relative;overflow:hidden}
-    .page{
-      display:none;
-      position:absolute;
-      inset:0;
-      overflow-y:auto;
-      scrollbar-width:thin;
-      scrollbar-color:var(--border2) transparent;
-    }
+    .main-content{flex:1;overflow:hidden;display:flex;flex-direction:column;min-width:0;position:relative}
+
+    /* ── PAGES — cada una ocupa exactamente el area de main-content ── */
+    .page{display:none;position:absolute;inset:0;flex-direction:column;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
     .page::-webkit-scrollbar{width:4px}
     .page::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
-    .page.active{display:flex;flex-direction:column}
+    .page.active{display:flex}
 
-    /* COMPOSE — scrollable, two-col workspace */
+    /* COMPOSE */
     .page-compose{padding:1.5rem 2rem;gap:0}
-    .page-compose .workspace{
-      padding:0;margin:0;max-width:none;width:100%;
-      display:grid;grid-template-columns:430px 1fr;gap:1.5rem;
-    }
+    .page-compose .workspace{padding:0;margin:0;max-width:none;width:100%;display:grid;grid-template-columns:430px 1fr;gap:1.5rem}
 
-    /* GMAIL PAGES — fixed header + scrollable list */
-    .page-gmail{padding:0;overflow:hidden}
-    .gmail-page-head{
-      display:flex;align-items:center;justify-content:space-between;
-      padding:1rem 1.8rem;
-      border-bottom:1px solid var(--border);
-      background:var(--surface2);
-      flex-shrink:0;
-      position:sticky;top:0;z-index:10;
-    }
+    /* GMAIL PAGES */
+    .page-gmail{overflow:hidden}
+    .gmail-page-head{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.8rem;border-bottom:1px solid var(--border);background:var(--surface2);flex-shrink:0}
     .gmail-page-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;display:flex;align-items:center;gap:10px}
-    .page-gmail .gmail-card{
-      flex:1;display:flex;flex-direction:column;
-      border:none;border-radius:0;box-shadow:none;
-      background:var(--surface);overflow:hidden;
-    }
-    .page-gmail .gmail-list{
-      flex:1;overflow-y:auto;max-height:none;
-      scrollbar-width:thin;scrollbar-color:var(--border2) transparent;
-    }
+    .page-gmail .gmail-card{flex:1;display:flex;flex-direction:column;border:none;border-radius:0;box-shadow:none;background:var(--surface);overflow:hidden;min-height:0}
+    .page-gmail .gmail-list{flex:1;overflow-y:auto;max-height:none;min-height:0;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
     .page-gmail .gmail-list::-webkit-scrollbar{width:4px}
     .page-gmail .gmail-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
     .gmail-item{padding:.9rem 1.8rem;border-bottom:1px solid var(--border);transition:background .15s}
@@ -304,6 +279,16 @@
       <span class="nav-icon">📝</span>
       <span class="nav-label">Borradores</span>
       <span class="nav-badge gold" id="draftsBadge" style="display:none">0</span>
+    </div>
+
+    <!-- Etiquetas Gmail -->
+    <div id="labelsSection" style="display:none">
+      <div class="nav-sep"></div>
+      <div class="sidebar-section" style="display:flex;align-items:center;justify-content:space-between;padding-right:.8rem">
+        <span>Etiquetas</span>
+        <span onclick="loadLabels()" style="cursor:pointer;font-size:.7rem;color:var(--text3);transition:color .15s" onmouseover="this.style.color='var(--navy-l)'" onmouseout="this.style.color='var(--text3)'">↻</span>
+      </div>
+      <div id="labelsList"></div>
     </div>
     
     <div style="flex:1"></div>
@@ -456,6 +441,17 @@
       </div>
       <div class="gmail-card" style="flex:1">
         <div id="draftsList" class="gmail-list"><div class="gmail-loading"><div class="gmail-spinner"></div> Cargando…</div></div>
+      </div>
+    </div>
+
+    <!-- PAGE: LABEL -->
+    <div class="page page-gmail" id="page-label">
+      <div class="gmail-page-head">
+        <div class="gmail-page-title" id="labelPageTitle">🏷️ Etiqueta</div>
+        <button class="btn-refresh" onclick="reloadCurrentLabel()">↻ Actualizar</button>
+      </div>
+      <div class="gmail-card" style="flex:1">
+        <div id="labelList" class="gmail-list"><div class="gmail-loading"><div class="gmail-spinner"></div> Cargando…</div></div>
       </div>
     </div>
 
@@ -962,7 +958,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 // ── GMAIL INTEGRATION ──────────────────────────────────────────────
 const GMAIL_CLIENT_ID = '1066562248893-p9s0qcairmts3aapc3k0546groqjrfmi.apps.googleusercontent.com'; // ← Reemplaza con tu Client ID de Google Cloud Console
-const GMAIL_SCOPE = 'https://www.googleapis.com/auth/gmail.readonly';
+const GMAIL_SCOPE = 'https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.labels';
 let gmailToken = null;
 let currentModalMsg = null;
 
@@ -980,6 +976,7 @@ function navTo(page, el){
   // Load gmail data when switching to those pages
   if(page==='inbox' && gmailToken) loadInbox();
   if(page==='drafts' && gmailToken) loadDrafts();
+  // label page is loaded directly by openLabel(), no extra call needed here
 }
 
 function initGmail(){
@@ -1041,6 +1038,8 @@ function showGmailPanel(){
   // Show badges
   document.getElementById('inboxBadge').style.display='';
   document.getElementById('draftsBadge').style.display='';
+  document.getElementById('labelsSection').style.display='';
+  loadLabels();
   // Load data for current page
   const activePage = document.querySelector('.page.active');
   if(activePage && activePage.id==='page-inbox') loadInbox();
@@ -1057,6 +1056,8 @@ function gmailDisconnect(){
   document.getElementById('navAccountEmail').textContent='Google no conectado';
   document.getElementById('inboxBadge').style.display='none';
   document.getElementById('draftsBadge').style.display='none';
+  document.getElementById('labelsSection').style.display='none';
+  document.getElementById('labelsList').innerHTML='';
   document.getElementById('inboxList').innerHTML='<div class="gmail-loading">Conecta tu cuenta de Google para ver los correos</div>';
   document.getElementById('draftsList').innerHTML='<div class="gmail-loading">Conecta tu cuenta de Google para ver los borradores</div>';
   showToast('Cuenta desconectada','success');
@@ -1241,6 +1242,104 @@ function formatGmailDate(raw){
     if(diff < 7*86400000) return d.toLocaleDateString('es',{weekday:'short'});
     return d.toLocaleDateString('es',{day:'2-digit',month:'short'});
   }catch(e){return '—';}
+}
+
+// ── ETIQUETAS ──────────────────────────────────────────────
+// Colores estándar de Gmail mapeados a hex
+const GMAIL_LABEL_COLORS = {
+  'CHAT':'#6d7fcc','SENT':'#5b7db5','INBOX':'#3d5a8a','IMPORTANT':'#c9a96e',
+  'TRASH':'#c06060','SPAM':'#c06060','STARRED':'#f5b400','UNREAD':'#5b7db5',
+  'DRAFT':'#c9a96e',
+  // colores de etiquetas de usuario (hex de Google)
+  '#000000':'#000000','#434343':'#6e6e6e','#666666':'#888','#999999':'#999',
+  '#b7b7b7':'#bbb','#cccccc':'#ccc','#d9d9d9':'#ddd','#efefef':'#efefef',
+  '#f3f3f3':'#f3f3f3','#ffffff':'#fff',
+  '#ff0000':'#e53935','#ff4433':'#f4511e','#ffad46':'#f6bf26','#ffd6a5':'#f6bf26',
+  '#42d692':'#33b679','#00ac46':'#0b8043','#7bd148':'#7cb342','#fbe983':'#e4c442',
+  '#4a86e8':'#4a86e8','#a4bdfc':'#a4bdfc','#46d6db':'#039be5','#7ae7bf':'#33b679',
+  '#dbadff':'#8e24aa','#e07798':'#d81b60','#dc2127':'#d50000','#f691b2':'#d81b60',
+};
+
+function labelColor(lbl){
+  if(lbl.color&&lbl.color.backgroundColor) return lbl.color.backgroundColor;
+  return GMAIL_LABEL_COLORS[lbl.id] || '#5b7db5';
+}
+
+// Etiquetas del sistema a excluir del sidebar (ya tenemos inbox/drafts)
+const SYSTEM_SKIP = new Set(['INBOX','SENT','TRASH','SPAM','DRAFT','UNREAD','STARRED','IMPORTANT','CHAT','CATEGORY_PERSONAL','CATEGORY_SOCIAL','CATEGORY_UPDATES','CATEGORY_FORUMS','CATEGORY_PROMOTIONS']);
+
+let currentLabelId = null;
+let currentLabelName = '';
+
+async function loadLabels(){
+  const container = document.getElementById('labelsList');
+  container.innerHTML = '<div style="padding:.4rem 1.2rem;font-size:.72rem;color:var(--text3)">Cargando…</div>';
+  const data = await gmailFetch('https://gmail.googleapis.com/gmail/v1/users/me/labels');
+  if(!data||!data.labels){ container.innerHTML=''; return; }
+
+  // Filtrar: sólo etiquetas de usuario (type=user) o las de sistema que queremos mostrar
+  const labels = data.labels
+    .filter(l => l.type === 'user' || !SYSTEM_SKIP.has(l.id))
+    .filter(l => !SYSTEM_SKIP.has(l.id))
+    .sort((a,b)=>a.name.localeCompare(b.name,'es'));
+
+  if(!labels.length){ container.innerHTML='<div style="padding:.4rem 1.2rem;font-size:.72rem;color:var(--text3)">Sin etiquetas</div>'; return; }
+
+  container.innerHTML = '';
+  labels.forEach(lbl => {
+    const dot = document.createElement('div');
+    dot.className = 'nav-item label-item';
+    dot.id = 'nav-label-'+lbl.id;
+    dot.onclick = () => openLabel(lbl.id, lbl.name);
+    dot.innerHTML = `
+      <span class="label-dot" style="background:${labelColor(lbl)}"></span>
+      <span class="nav-label">${escHtml(lbl.name)}</span>`;
+    container.appendChild(dot);
+  });
+}
+
+function reloadCurrentLabel(){
+  if(currentLabelId) openLabel(currentLabelId, currentLabelName);
+}
+
+async function openLabel(labelId, labelName){
+  currentLabelId = labelId;
+  currentLabelName = labelName;
+
+  // Activar nav
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const nav = document.getElementById('nav-label-'+labelId);
+  if(nav) nav.classList.add('active');
+
+  // Título de la página
+  document.getElementById('labelPageTitle').textContent = '🏷️ '+labelName;
+
+  navTo('label', null);
+
+  const list = document.getElementById('labelList');
+  list.innerHTML = '<div class="gmail-loading"><div class="gmail-spinner"></div> Cargando…</div>';
+
+  const data = await gmailFetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=25&labelIds=${encodeURIComponent(labelId)}`);
+  if(!data){ list.innerHTML='<div class="gmail-empty">⚠️ Error al cargar</div>'; return; }
+  if(!data.messages||!data.messages.length){ list.innerHTML=`<div class="gmail-empty">📭 Sin correos en "${escHtml(labelName)}"</div>`; return; }
+
+  list.innerHTML = '';
+  for(const m of data.messages.slice(0,20)){
+    const info = await gmailFetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${m.id}?format=metadata&metadataHeaders=From&metadataHeaders=Subject&metadataHeaders=Date`);
+    if(!info) continue;
+    const headers = info.payload&&info.payload.headers||[];
+    const h = k=>headers.find(x=>x.name===k)||{value:''};
+    const from = h('From').value.replace(/<.*>/,'').trim()||h('From').value;
+    const subject = h('Subject').value||'(Sin asunto)';
+    const date = formatGmailDate(h('Date').value);
+    const unread = info.labelIds&&info.labelIds.includes('UNREAD');
+    const avatar = from.charAt(0).toUpperCase()||'?';
+    const el = document.createElement('div');
+    el.className = 'gmail-item'+(unread?' unread':'');
+    el.onclick = ()=>openEmail(m.id);
+    el.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;gap:3px;">${unread?'<div class="unread-dot"></div>':''}<div class="gmail-avatar">${escHtml(avatar)}</div></div><div class="gmail-content"><div class="gmail-row1"><div class="gmail-sender">${escHtml(from)}</div><div class="gmail-time">${date}</div></div><div class="gmail-subject">${escHtml(subject)}</div><div class="gmail-snippet">${escHtml((info.snippet||'').substring(0,80))}</div></div>`;
+    list.appendChild(el);
+  }
 }
 
 function escHtml(s){
