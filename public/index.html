@@ -123,6 +123,8 @@
     .nav-item .nav-label{flex:1}
     .nav-item .nav-badge{background:var(--navy-dim);color:var(--navy-l);font-size:.63rem;font-weight:700;padding:1px 7px;border-radius:12px;min-width:20px;text-align:center}
     .nav-item .nav-badge.gold{background:rgba(201,169,110,.15);color:var(--gold)}
+    .unread-nav-dot{position:absolute;top:-3px;right:-4px;width:8px;height:8px;background:var(--navy-l);border-radius:50%;box-shadow:0 0 0 2px var(--surface);animation:navDotPulse 2s ease-in-out infinite}
+    @keyframes navDotPulse{0%,100%{box-shadow:0 0 0 2px var(--surface),0 0 0 0 rgba(91,125,181,.6)}60%{box-shadow:0 0 0 2px var(--surface),0 0 0 5px rgba(91,125,181,0)}}
     .nav-sep{height:1px;background:var(--border);margin:.6rem .8rem}
     .nav-account{margin:.6rem;padding:.8rem;background:var(--surface2);border:1px solid var(--border);border-radius:11px}
     .nav-account-email{font-size:.72rem;color:var(--text3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -134,6 +136,14 @@
     .label-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
     .nav-item.label-item{padding:.5rem 1rem;margin:.05rem .6rem;font-size:.8rem}
     .nav-item.label-item .nav-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    /* grupos de etiquetas */
+    .label-group-header{display:flex;align-items:center;gap:8px;padding:.45rem .8rem .45rem 1rem;margin:.05rem .6rem;border-radius:10px;cursor:pointer;color:var(--text3);font-size:.78rem;font-weight:600;transition:all .18s;user-select:none}
+    .label-group-header:hover{background:var(--surface2);color:var(--text2)}
+    .label-group-arrow{font-size:.65rem;transition:transform .2s;flex-shrink:0;opacity:.6}
+    .label-group-arrow.open{transform:rotate(90deg)}
+    .label-group-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+    .label-group-children{overflow:hidden;transition:max-height .25s ease}
+    .label-group-children .nav-item.label-item{padding:.45rem 1rem .45rem 2.2rem;font-size:.78rem}
 
     /* ── MAIN CONTENT ── */
     .main-content{flex:1;overflow:hidden;display:flex;flex-direction:column;min-width:0;position:relative}
@@ -271,7 +281,7 @@
     <div class="sidebar-section">Gmail</div>
     
     <div class="nav-item" onclick="navTo('inbox',this)" id="nav-inbox">
-      <span class="nav-icon">📥</span>
+      <span class="nav-icon" style="position:relative">📥<span id="inboxUnreadDot" class="unread-nav-dot" style="display:none"></span></span>
       <span class="nav-label">Bandeja</span>
       <span class="nav-badge" id="inboxBadge" style="display:none">0</span>
     </div>
@@ -488,6 +498,13 @@ const EMAIL_URL = "mailto:nutricionalmeteeva@gmail.com";
 const WA_ICON = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjE4IiBoZWlnaHQ9IjE4Ij48cGF0aCBmaWxsPSIjZmZmZmZmIiBkPSJNMTcuNDcyIDE0LjM4MmMtLjI5Ny0uMTQ5LTEuNzU4LS44NjctMi4wMy0uOTY3LS4yNzMtLjA5OS0uNDcxLS4xNDgtLjY3LjE1LS4xOTcuMjk3LS43NjcuOTY2LS45NCAxLjE2NC0uMTczLjE5OS0uMzQ3LjIyMy0uNjQ0LjA3NS0uMjk3LS4xNS0xLjI1NS0uNDYzLTIuMzktMS40NzUtLjg4My0uNzg4LTEuNDgtMS43NjEtMS42NTMtMi4wNTktLjE3My0uMjk3LS4wMTgtLjQ1OC4xMy0uNjA2LjEzNC0uMTMzLjI5OC0uMzQ3LjQ0Ni0uNTIuMTQ5LS4xNzQuMTk4LS4yOTguMjk4LS40OTcuMDk5LS4xOTguMDUtLjM3MS0uMDI1LS41Mi0uMDc1LS4xNDktLjY2OS0xLjYxMi0uOTE2LTIuMjA3LS4yNDItLjU3OS0uNDg3LS41LS42NjktLjUxLS4xNzMtLjAwOC0uMzcxLS4wMS0uNTctLjAxLS4xOTggMC0uNTIuMDc0LS43OTIuMzcyLS4yNzIuMjk3LTEuMDQgMS4wMTYtMS4wNCAyLjQ3OSAwIDEuNDYyIDEuMDY1IDIuODc1IDEuMjEzIDMuMDc0LjE0OS4xOTggMi4wOTYgMy4yIDUuMDc3IDQuNDg3LjcwOS4zMDYgMS4yNjIuNDg5IDEuNjk0LjYyNS43MTIuMjI3IDEuMzYuMTk1IDEuODcxLjExOC41NzEtLjA4NSAxLjc1OC0uNzE5IDIuMDA2LTEuNDEzLjI0OC0uNjk0LjI0OC0xLjI4OS4xNzMtMS40MTMtLjA3NC0uMTI0LS4yNzItLjE5OC0uNTctLjM0N20tNS40MjEgNy40MDNoLS4wMDRhOS44NyA5Ljg3IDAgMDEtNS4wMzEtMS4zNzhsLS4zNjEtLjIxNC0zLjc0MS45ODIuOTk4LTMuNjQ4LS4yMzUtLjM3NGE5Ljg2IDkuODYgMCAwMS0xLjUxLTUuMjZjLjAwMS01LjQ1IDQuNDM2LTkuODg0IDkuODg4LTkuODg0IDIuNjQgMCA1LjEyMiAxLjAzIDYuOTg4IDIuODk4YTkuODI1IDkuODI1IDAgMDEyLjg5MyA2Ljk5NGMtLjAwMyA1LjQ1LTQuNDM3IDkuODg0LTkuODg1IDkuODg0bTguNDEzLTE4LjI5N0ExMS44MTUgMTEuODE1IDAgMDAxMi4wNSAwQzUuNDk1IDAgLjE2IDUuMzM1LjE1NyAxMS44OTJjMCAyLjA5Ni41NDcgNC4xNDIgMS41ODggNS45NDVMLjA1NyAyNGw2LjMwNS0xLjY1NGExMS44ODIgMTEuODgyIDAgMDA1LjY4MyAxLjQ0OGguMDA1YzYuNTU0IDAgMTEuODktNS4zMzUgMTEuODkzLTExLjg5M2ExMS44MjEgMTEuODIxIDAgMDAtMy40OC04LjQxM1oiLz48L3N2Zz4=";
 const MAIL_ICON = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjE4IiBoZWlnaHQ9IjE4Ij48cGF0aCBmaWxsPSIjZmZmZmZmIiBkPSJNMjAgNEg0Yy0xLjEgMC0yIC45LTIgMnYxMmMwIDEuMS45IDIgMiAyaDE2YzEuMSAwIDItLjkgMi0yVjZjMC0xLjEtLjktMi0yLTJ6bTAgNGwtOCA1LTgtNVY2bDggNSA4LTV2MnoiLz48L3N2Zz4=";
 
+const LEGAL_FOOTER = `
+<tr><td bgcolor="#eef2f8" style="background-color:#eef2f8;border-top:1px solid #dce6f5;padding:20px 24px;border-radius:0 0 16px 16px;">
+  <p style="margin:0 0 6px;font-size:12px;color:#7a8aaa;font-family:Arial,Helvetica,sans-serif;text-align:center;"><strong>Nutrición Meteeva</strong> &nbsp;&middot;&nbsp; nutricionalmeteeva@gmail.com &nbsp;&middot;&nbsp; 644 137 667</p>
+  <p style="margin:8px 0 4px;font-size:10px;color:#3d5a8a;font-family:Arial,Helvetica,sans-serif;text-align:center;font-weight:700;letter-spacing:.4px;">Técnico Superior en Dietética &nbsp;·&nbsp; Asnadi nº 1222</p>
+  <p style="margin:6px 0 0;font-size:9px;color:#aab8cc;font-family:Arial,Helvetica,sans-serif;line-height:1.55;text-align:justify;">La información contenida en este correo electrónico, y en su caso en los documentos adjuntos, es información privilegiada para uso exclusivo de la/s persona/s a la/s que va dirigido. Si Usted no es uno de los destinatarios, cualquier duplicación, reproducción, distribución, así como cualquier uso de la información contenida en él o cualquiera otra acción u omisión tomada en relación con el mismo, está prohibida y puede ser ilegal. En dicho caso, por favor notifíquelo al remitente y proceda a la eliminación de este correo electrónico, así como de sus adjuntos si los hubiere. En cumplimiento de L.O.3/2018 de Protección de Datos de Carácter Personal y Garantía de los Derechos Digitales y del Reglamento Europeo (UE) 679/2016 le informamos que sus datos están siendo objeto de tratamiento por parte de EVA MARÍA VIDAL GARCÍA con NIF 50207596E, con la finalidad del mantenimiento y gestión de relaciones comerciales y administrativas. La base jurídica del tratamiento es el interés legítimo del Responsable, la ejecución de un contrato, y/o el cumplimiento de la legislación fiscal, mercantil y contable. No se prevén cesiones a terceras partes, salvo obligación legal. Para ejercitar sus derechos puede dirigirse a EVA MARÍA VIDAL GARCÍA por email a nutricionalmenteeva@gmail.com, indicando en el asunto: "Derechos Ley Protección de Datos", y adjuntando fotocopia de su DNI - NIE, en su caso. Asimismo, tiene derecho a presentar una reclamación ante la Agencia Española de Protección de Datos.</p>
+</td></tr>`;
+
 const CONTACT_BLOCK = `
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0;">
   <tr>
@@ -664,10 +681,7 @@ function buildCustom(){
     ${CONTACT_BLOCK}
   </td></tr>
   <!-- FOOTER -->
-  <tr><td bgcolor="#eef2f8" style="background-color:#eef2f8;border-top:1px solid #dce6f5;border-radius:0 0 16px 16px;padding:20px;text-align:center;">
-    <p style="margin:0;font-size:12px;color:#7a8aaa;font-family:Arial,Helvetica,sans-serif;"><strong>Nutrición Meteeva</strong></p>
-    <p style="margin:5px 0 0;font-size:12px;color:#7a8aaa;font-family:Arial,Helvetica,sans-serif;">nutricionalmeteeva@gmail.com &middot; 644 137 667</p>
-  </td></tr>
+  ${LEGAL_FOOTER}
 </table>
 </td></tr></table>
 </body></html>`;
@@ -714,10 +728,7 @@ const TPLS={
     ${CONTACT_BLOCK}
   </td></tr>
   <!-- FOOTER -->
-  <tr><td bgcolor="#eef2f8" style="background-color:#eef2f8;border-top:1px solid #dce6f5;border-radius:0 0 16px 16px;padding:20px;text-align:center;">
-    <p style="margin:0;font-size:12px;color:#7a8aaa;font-family:Arial,Helvetica,sans-serif;"><strong>Nutrición Meteeva</strong></p>
-    <p style="margin:5px 0 0;font-size:12px;color:#7a8aaa;font-family:Arial,Helvetica,sans-serif;">nutricionalmeteeva@gmail.com &middot; 644 137 667</p>
-  </td></tr>
+  ${LEGAL_FOOTER}
 </table>
 </td></tr></table>
 </body></html>`
@@ -789,10 +800,7 @@ const TPLS={
     ${CONTACT_BLOCK}
   </td></tr>
   <!-- FOOTER -->
-  <tr><td bgcolor="#eef2f8" style="background-color:#eef2f8;border-top:1px solid #dce6f5;border-radius:0 0 16px 16px;padding:20px;text-align:center;">
-    <p style="margin:0;font-size:12px;color:#7a8aaa;font-family:Arial,Helvetica,sans-serif;"><strong>Nutrición Meteeva</strong></p>
-    <p style="margin:5px 0 0;font-size:12px;color:#7a8aaa;font-family:Arial,Helvetica,sans-serif;">nutricionalmeteeva@gmail.com &middot; 644 137 667</p>
-  </td></tr>
+  ${LEGAL_FOOTER}
 </table>
 </td></tr></table>
 </body></html>`
@@ -1035,15 +1043,41 @@ function showGmailPanel(){
   document.getElementById('navDisconnectBtn').style.display='';
   document.getElementById('navAccountName').textContent='Gmail conectado';
   document.getElementById('navAccountEmail').textContent='nutricionalmeteeva@gmail.com';
-  // Show badges
-  document.getElementById('inboxBadge').style.display='';
-  document.getElementById('draftsBadge').style.display='';
+  // Show labels section
   document.getElementById('labelsSection').style.display='';
   loadLabels();
+  // Cargar badges reales en segundo plano sin entrar en las páginas
+  loadBadges();
   // Load data for current page
   const activePage = document.querySelector('.page.active');
   if(activePage && activePage.id==='page-inbox') loadInbox();
   else if(activePage && activePage.id==='page-drafts') loadDrafts();
+}
+
+async function loadBadges(){
+  // Badge bandeja: no leídos
+  const inboxInfo = await gmailFetch('https://gmail.googleapis.com/gmail/v1/users/me/labels/INBOX');
+  if(inboxInfo){
+    const unread = inboxInfo.messagesUnread||0;
+    const badge = document.getElementById('inboxBadge');
+    const dot = document.getElementById('inboxUnreadDot');
+    if(unread > 0){
+      badge.textContent = unread>99?'99+':unread;
+      badge.style.display = '';
+      dot.style.display = '';
+    } else {
+      badge.style.display = 'none';
+      dot.style.display = 'none';
+    }
+  }
+  // Badge borradores: total
+  const draftInfo = await gmailFetch('https://gmail.googleapis.com/gmail/v1/users/me/labels/DRAFT');
+  if(draftInfo){
+    const total = draftInfo.messagesTotal||0;
+    const badge = document.getElementById('draftsBadge');
+    if(total > 0){ badge.textContent = total>99?'99+':total; badge.style.display=''; }
+    else { badge.style.display='none'; }
+  }
 }
 
 function gmailDisconnect(){
@@ -1056,6 +1090,7 @@ function gmailDisconnect(){
   document.getElementById('navAccountEmail').textContent='Google no conectado';
   document.getElementById('inboxBadge').style.display='none';
   document.getElementById('draftsBadge').style.display='none';
+  document.getElementById('inboxUnreadDot').style.display='none';
   document.getElementById('labelsSection').style.display='none';
   document.getElementById('labelsList').innerHTML='';
   document.getElementById('inboxList').innerHTML='<div class="gmail-loading">Conecta tu cuenta de Google para ver los correos</div>';
@@ -1081,16 +1116,26 @@ async function loadInbox(){
   const list = document.getElementById('inboxList');
   if(!gmailToken){list.innerHTML='<div class="gmail-empty">🔗 Conecta tu cuenta de Google desde el menú lateral</div>';return;}
   list.innerHTML='<div class="gmail-loading"><div class="gmail-spinner"></div> Cargando…</div>';
+
+  // Obtener conteo real de no leídos desde el label INBOX
+  const labelInfo = await gmailFetch('https://gmail.googleapis.com/gmail/v1/users/me/labels/INBOX');
+  if(labelInfo && labelInfo.messagesUnread != null){
+    const unreadCnt = labelInfo.messagesUnread;
+    const badge = document.getElementById('inboxBadge');
+    if(unreadCnt > 0){
+      badge.textContent = unreadCnt > 99 ? '99+' : unreadCnt;
+      badge.style.display = '';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
   const data = await gmailFetch('https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=20&labelIds=INBOX&q=in:inbox');
   if(!data){list.innerHTML='<div class="gmail-empty">⚠️ Error al cargar</div>';return;}
   if(!data.messages||!data.messages.length){
     list.innerHTML='<div class="gmail-empty">📭 Bandeja vacía</div>';
-    document.getElementById('inboxBadge').textContent='0';
     return;
   }
-  const inbCnt = data.resultSizeEstimate||data.messages.length;
-  document.getElementById('inboxBadge').textContent=inbCnt>99?'99+':inbCnt;
-  document.getElementById('inboxBadge').style.display='';
   list.innerHTML='';
   const msgs = data.messages.slice(0,15);
   for(const m of msgs){
@@ -1115,16 +1160,26 @@ async function loadDrafts(){
   const list = document.getElementById('draftsList');
   if(!gmailToken){list.innerHTML='<div class="gmail-empty">🔗 Conecta tu cuenta de Google desde el menú lateral</div>';return;}
   list.innerHTML='<div class="gmail-loading"><div class="gmail-spinner"></div> Cargando…</div>';
+
+  // Obtener conteo real de borradores desde el label DRAFT
+  const labelInfo = await gmailFetch('https://gmail.googleapis.com/gmail/v1/users/me/labels/DRAFT');
+  if(labelInfo && labelInfo.messagesTotal != null){
+    const total = labelInfo.messagesTotal;
+    const badge = document.getElementById('draftsBadge');
+    if(total > 0){
+      badge.textContent = total > 99 ? '99+' : total;
+      badge.style.display = '';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
   const data = await gmailFetch('https://gmail.googleapis.com/gmail/v1/users/me/drafts?maxResults=15');
   if(!data){list.innerHTML='<div class="gmail-empty">⚠️ Error al cargar</div>';return;}
   if(!data.drafts||!data.drafts.length){
     list.innerHTML='<div class="gmail-empty">📋 Sin borradores</div>';
-    document.getElementById('draftsBadge').textContent='0';
     return;
   }
-  const drCnt = data.resultSizeEstimate||data.drafts.length;
-  document.getElementById('draftsBadge').textContent=drCnt>99?'99+':drCnt;
-  document.getElementById('draftsBadge').style.display='';
   list.innerHTML='';
   const drafts = data.drafts.slice(0,12);
   for(const d of drafts){
@@ -1277,25 +1332,94 @@ async function loadLabels(){
   const data = await gmailFetch('https://gmail.googleapis.com/gmail/v1/users/me/labels');
   if(!data||!data.labels){ container.innerHTML=''; return; }
 
-  // Filtrar: sólo etiquetas de usuario (type=user) o las de sistema que queremos mostrar
   const labels = data.labels
-    .filter(l => l.type === 'user' || !SYSTEM_SKIP.has(l.id))
     .filter(l => !SYSTEM_SKIP.has(l.id))
     .sort((a,b)=>a.name.localeCompare(b.name,'es'));
 
   if(!labels.length){ container.innerHTML='<div style="padding:.4rem 1.2rem;font-size:.72rem;color:var(--text3)">Sin etiquetas</div>'; return; }
 
-  container.innerHTML = '';
+  // Detectar grupos: nombre con "/" → padre/hijo
+  // Construir árbol: { groupName: { color, children: [lbl,...] }, __root__: [lbl,...] }
+  const groups = {}; // groupName → { color, children }
+  const roots = [];  // etiquetas sin grupo
+
   labels.forEach(lbl => {
-    const dot = document.createElement('div');
-    dot.className = 'nav-item label-item';
-    dot.id = 'nav-label-'+lbl.id;
-    dot.onclick = () => openLabel(lbl.id, lbl.name);
-    dot.innerHTML = `
+    const slash = lbl.name.indexOf('/');
+    if(slash !== -1){
+      const groupName = lbl.name.substring(0, slash);
+      const childName = lbl.name.substring(slash + 1);
+      if(!groups[groupName]) groups[groupName] = { color: labelColor(lbl), children: [] };
+      groups[groupName].children.push({ ...lbl, shortName: childName });
+    } else {
+      roots.push(lbl);
+    }
+  });
+
+  container.innerHTML = '';
+
+  // Renderizar grupos primero (ordenados), luego raíz
+  const groupNames = Object.keys(groups).sort((a,b)=>a.localeCompare(b,'es'));
+
+  groupNames.forEach(groupName => {
+    const g = groups[groupName];
+    const groupId = 'lg-' + groupName.replace(/\W/g,'_');
+
+    // Cabecera del grupo
+    const header = document.createElement('div');
+    header.className = 'label-group-header';
+    header.innerHTML = `
+      <span class="label-group-arrow" id="arr-${groupId}">▶</span>
+      <span class="label-group-dot" style="background:${g.color}"></span>
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(groupName)}</span>
+      <span style="font-size:.65rem;opacity:.5">${g.children.length}</span>`;
+    header.onclick = () => toggleLabelGroup(groupId);
+    container.appendChild(header);
+
+    // Hijos
+    const children = document.createElement('div');
+    children.className = 'label-group-children';
+    children.id = groupId;
+    children.style.maxHeight = '0';
+
+    g.children.forEach(lbl => {
+      const item = document.createElement('div');
+      item.className = 'nav-item label-item';
+      item.id = 'nav-label-' + lbl.id;
+      item.onclick = () => openLabel(lbl.id, lbl.name);
+      item.innerHTML = `
+        <span class="label-dot" style="background:${labelColor(lbl)}"></span>
+        <span class="nav-label">${escHtml(lbl.shortName)}</span>`;
+      children.appendChild(item);
+    });
+
+    container.appendChild(children);
+  });
+
+  // Etiquetas sin grupo
+  roots.forEach(lbl => {
+    const item = document.createElement('div');
+    item.className = 'nav-item label-item';
+    item.id = 'nav-label-' + lbl.id;
+    item.onclick = () => openLabel(lbl.id, lbl.name);
+    item.innerHTML = `
       <span class="label-dot" style="background:${labelColor(lbl)}"></span>
       <span class="nav-label">${escHtml(lbl.name)}</span>`;
-    container.appendChild(dot);
+    container.appendChild(item);
   });
+}
+
+function toggleLabelGroup(groupId){
+  const children = document.getElementById(groupId);
+  const arrow = document.getElementById('arr-' + groupId);
+  if(!children) return;
+  const isOpen = children.style.maxHeight !== '0px' && children.style.maxHeight !== '0';
+  if(isOpen){
+    children.style.maxHeight = '0';
+    arrow.classList.remove('open');
+  } else {
+    children.style.maxHeight = children.scrollHeight + 'px';
+    arrow.classList.add('open');
+  }
 }
 
 function reloadCurrentLabel(){
