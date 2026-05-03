@@ -169,8 +169,8 @@
     .tpl-field-header{font-size:.68rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:.6rem;display:flex;align-items:center;gap:7px}
     .tpl-field-header::after{content:'';flex:1;height:1px;background:var(--border)}
   </style>
-</head>
-<body>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head><body>
 
 <header>
   <div class="logo">
@@ -777,35 +777,22 @@ function initGmail(){
   }
 }
 
+let _tokenClient = null;
 function gmailAuth(){
-  if(GMAIL_CLIENT_ID.startsWith('TU_CLIENT_ID')){
-    showToast('⚠️ Configura tu Client ID de Google en el código','error');
-    return;
-  }
-  const params = new URLSearchParams({
-    client_id: GMAIL_CLIENT_ID,
-    redirect_uri: location.origin + location.pathname,
-    response_type: 'token',
-    scope: GMAIL_SCOPE,
-    prompt: 'select_account'
-  });
-  const w = window.open('https://accounts.google.com/o/oauth2/v2/auth?' + params.toString(),
-    'gmail_auth','width=520,height=620,left=200,top=100');
-  const checkInterval = setInterval(()=>{
-    try{
-      if(!w || w.closed){clearInterval(checkInterval);return;}
-      const hash = w.location.hash;
-      if(hash && hash.includes('access_token')){
-        const p = new URLSearchParams(hash.slice(1));
-        gmailToken = p.get('access_token');
+  if(!_tokenClient){
+    _tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: GMAIL_CLIENT_ID,
+      scope: GMAIL_SCOPE,
+      callback: (resp) => {
+        if(resp.error){ showToast('⚠️ Error al conectar con Google: '+resp.error,'error'); return; }
+        gmailToken = resp.access_token;
         sessionStorage.setItem('gm_token', gmailToken);
         sessionStorage.setItem('gm_exp', Date.now() + 3500*1000);
-        clearInterval(checkInterval);
-        w.close();
         showGmailPanel();
       }
-    }catch(e){}
-  }, 400);
+    });
+  }
+  _tokenClient.requestAccessToken({prompt:'select_account'});
 }
 
 function showGmailPanel(){
